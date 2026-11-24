@@ -2,7 +2,7 @@
 
 > Responde: ¿cómo se mueve cada actor por CompuLab, qué ve primero, por qué se organizó así y qué pasa en pantalla cuando algo falla?
 > Criterios: presentaciones de UX/UI del curso (conceptos de usabilidad, heurísticas de Nielsen y leyes de diseño, componentes de UI).
-> Versión 2026-11-24. Esta primera parte cubre la **arquitectura de información y el flujo de navegación**. Los prototipos, la guía visual y la evaluación heurística se agregarán después (15.9).
+> Versión 2026-11-24. Esta primera parte cubre la **arquitectura de información y el flujo de navegación**. El prototipo navegable está en `docs/prototipo/` (15.9); la guía visual completa y la evaluación heurística se agregarán después (15.10).
 
 ## 15.1 Principios de navegación
 
@@ -157,9 +157,9 @@ flowchart TB
     B -- "sí" --> D["Día: hoy y los próximos 6 días<br/>(no se ofrece más allá, RN-16)"]
     D --> E["Tarjetas de los laboratorios de la sede:<br/>franjas abiertas y máquinas libres"]
     E -- "laboratorio sin franjas" --> E2["Tarjeta deshabilitada:<br/>'Cerrado este día' (ext 2a)"]
-    E -- "elige laboratorio" --> F["Máquinas del laboratorio:<br/>libre · reservada · fuera de servicio"]
-    F -- "elige máquina libre" --> G["Inicio y fin: solo dentro de franjas abiertas,<br/>duración máxima 2 h"]
-    G --> H["Modal de confirmación: máquina, día, hora,<br/>horas que quedarán en la semana"]
+    E -- "elige laboratorio" --> G["Hora de inicio (solo dentro de franjas abiertas)<br/>y duración (máximo 2 h y lo que le quede de sus 6 h)"]
+    G --> F["Plano del laboratorio para ese horario:<br/>libre · reservada · fuera de servicio"]
+    F -- "elige máquina libre" --> H["Modal de confirmación: máquina, día, hora,<br/>horas que quedarán en la semana"]
     H -- "Cancelar" --> F
     H -- "Confirmar" --> I["Enviando… (botón deshabilitado)"]
     I -- "201 o 200" --> J["Reserva confirmada:<br/>'Preséntate antes de las HH:MM'"] --> K["/mis-reservas"]
@@ -169,7 +169,7 @@ flowchart TB
 
 Leyenda: rectángulo = estado de la pantalla; rombo = decisión; flecha = transición con la acción o respuesta que la provoca.
 
-Antes de mostrar las máquinas, la pantalla consulta `GET /reservas/mias`. Si el estudiante ya tiene una reserva activa o usó sus 6 horas, lo dice arriba ("Ya tienes una reserva activa hoy a las 10:00") y deshabilita "Reservar" con la explicación. Así se previenen las extensiones 6a y 6b en lugar de mostrarlas como error (N-7).
+Primero se elige la hora y después la máquina: así el plano solo ofrece las máquinas libres en ese horario y el estudiante no puede elegir una que choque (N-7). Antes de mostrar las máquinas, la pantalla consulta `GET /reservas/mias`. Si el estudiante ya tiene una reserva activa o usó sus 6 horas, lo dice arriba ("Ya tienes una reserva activa hoy a las 10:00") y deshabilita "Reservar" con la explicación. Así se previenen las extensiones 6a y 6b en lugar de mostrarlas como error (N-7).
 
 | Código de la API | Mensaje al estudiante | Acción que se ofrece |
 | --- | --- | --- |
@@ -249,9 +249,13 @@ En el núcleo no hay Directorio real. `/ingresar` muestra tarjetas con usuarios 
 | Error interno (`500`) | Mensaje genérico con el número de la solicitud (`idSolicitud`) para reportarlo | Heurística 9; trazas correlacionadas |
 | Lista vacía | Texto que explica por qué está vacía y qué hacer (por ejemplo, "No hay laboratorios abiertos este día; prueba otro día") | Heurística 1 |
 
-## 15.9 Pendiente en esta sección
-- Prototipos de baja fidelidad (wireframes) de las tres pantallas del núcleo y luego de alta fidelidad.
-- Guía visual: tipografía, color, grilla y componentes (Atomic Design).
+## 15.9 Prototipo
+
+El prototipo navegable de alta fidelidad está en `docs/prototipo/` (instrucciones, sistema de diseño y exportación a Figma en su `README.md`). Implementa el selector de rol simulado, el esqueleto por rol de 15.2 a 15.4 y los tres flujos de 15.6, con un control para simular respuestas del servidor (normal, conflicto y sin respuesta).
+
+## 15.10 Pendiente en esta sección
+- Prototipos de baja fidelidad (wireframes) para documentar la evolución del diseño.
+- Guía visual completa: grilla y componentes (Atomic Design); los tokens de color y tipografía ya están en `docs/prototipo/README.md`.
 - Accesibilidad: contraste y textos alternativos según WCAG 2.2.
 - Evaluación heurística de los prototipos y plan de medición (tasa de éxito, tiempo en tarea y cuestionario SUS).
 - Justificación de cada decisión visual con heurísticas y leyes.
