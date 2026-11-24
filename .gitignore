@@ -4,6 +4,9 @@ dist/
 build/
 coverage/
 
+# Proyectos temporales de las pruebas de funciones de aptitud
+.aptitud-tmp/
+
 # Variables de entorno (solo se sube .env.example)
 .env
 .env.*

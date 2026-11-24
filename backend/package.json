@@ -8,16 +8,18 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "aptitud": "depcruise src --config .dependency-cruiser.cjs",
+    "build": "npm run aptitud && tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "npm run aptitud && vitest run",
     "test:watch": "vitest",
     "verificar": "npm run typecheck && npm test"
   },
   "devDependencies": {
     "@types/node": "24.19.2",
-    "typescript": "7.0.2",
+    "dependency-cruiser": "18.9.0",
+    "typescript": "6.0.3",
     "vitest": "5.1.1"
   }
 }

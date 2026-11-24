@@ -32,7 +32,7 @@ La Escuela no eligió lenguaje ni framework. La elección y sus alternativas est
 | Contenedores | Docker Engine + Docker Compose | Apache 2.0 | R-1, R-4 |
 | Base de datos | PostgreSQL 14 | PostgreSQL License | R-2, R-4 |
 | Migraciones | Flyway Community 11 (`database/migrations`) | Apache 2.0 | R-4 |
-| Backend | Node.js 24 LTS + TypeScript | MIT / Apache 2.0 | R-4, R-5 a R-7 |
+| Backend | Node.js 24 LTS + TypeScript 6 | MIT / Apache 2.0 | R-4, R-5 a R-7 |
 | Servidor HTTP del backend | Fastify | MIT | R-4 |
 | Acceso a datos | `pg` + Kysely (SQL tipado, sin migraciones propias) | MIT | R-4 |
 | Tareas programadas | node-cron, dentro del backend | ISC | R-4 (ADR-0003) |
@@ -41,6 +41,8 @@ La Escuela no eligió lenguaje ni framework. La elección y sus alternativas est
 | Pruebas | Vitest | MIT | R-8 |
 | Funciones de aptitud | dependency-cruiser | MIT | R-9 |
 | Frontend | React + TypeScript, compilado con Vite y servido por Nginx | MIT / BSD-2 | R-4 |
+
+Versiones fijadas en `backend/package.json`. Se usa **TypeScript 6** y no 7.0: el compilador nativo de TypeScript 7.0 no incluye la API de JavaScript que dependency-cruiser necesita para analizar el código, y dependency-cruiser solo admite TypeScript 7 a partir de la 7.1. Sin esa API no se pueden ejecutar las funciones de aptitud (R-9).
 
 ## 6.4 Lo que queda prohibido por estas restricciones
 

@@ -1,6 +1,7 @@
 node_modules
 dist
 coverage
+.aptitud-tmp
 .env
 .env.*
 .git
