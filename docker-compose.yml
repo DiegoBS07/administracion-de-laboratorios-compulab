@@ -1,0 +1,83 @@
+# CompuLab: contenedores definidos en Context/Servicios.md
+# El servicio frontend se agregará cuando exista frontend/Dockerfile.
+# Antes de levantar: copie .env.example como .env y ajuste los valores.
+
+name: compulab
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: America/Costa_Rica
+      PGTZ: America/Costa_Rica
+    ports:
+      # Solo accesible desde la máquina local (herramientas de desarrollo)
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - compulab_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    mem_limit: 512m
+    restart: unless-stopped
+
+  migraciones:
+    image: flyway/flyway:11
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      FLYWAY_USER: ${POSTGRES_USER}
+      FLYWAY_PASSWORD: ${POSTGRES_PASSWORD}
+      FLYWAY_CONNECT_RETRIES: 10
+    command: migrate
+    volumes:
+      - ./database/migrations:/flyway/sql:ro
+    networks:
+      - compulab_network
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: compulab-backend:latest
+    environment:
+      NODE_ENV: production
+      TZ: America/Costa_Rica
+      APP_PORT: ${APP_PORT}
+      APP_DB_HOST: db
+      APP_DB_PORT: 5432
+      APP_DB: ${POSTGRES_DB}
+      APP_DB_USER: ${POSTGRES_USER}
+      APP_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      migraciones:
+        condition: service_completed_successfully
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    networks:
+      - compulab_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT}/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    mem_limit: 512m
+    restart: unless-stopped
+
+networks:
+  compulab_network:
+
+volumes:
+  postgres_data:

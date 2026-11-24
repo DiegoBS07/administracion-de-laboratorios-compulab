@@ -1,0 +1,20 @@
+# Dependencias y compilados
+node_modules/
+dist/
+build/
+coverage/
+
+# Variables de entorno (solo se sube .env.example)
+.env
+.env.*
+!.env.example
+
+# Bitácoras
+*.log
+npm-debug.log*
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
