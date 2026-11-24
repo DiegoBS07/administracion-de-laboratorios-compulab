@@ -240,7 +240,7 @@ Es la interfaz provista del contenedor `backend` y el acuerdo que permite trabaj
 | 500 | `ERROR_AL_GENERAR_ARCHIVO`, `ERROR_INTERNO` (nunca por una regla de negocio) |
 | 503 | `DIRECTORIO_NO_DISPONIBLE` (solo al iniciar sesión, ADR-0011) |
 
-### Sesión (navegación por rol, `15-diseno-ux-ui.md`)
+### Sesión (navegación por rol, `diseno-ux-ui.md`)
 | Método y ruta | Uso | Respuesta |
 | --- | --- | --- |
 | `POST /api/v1/sesion` | Iniciar sesión. Cuerpo: `{ usuario, secreto }`. En el núcleo ejecutable lo reemplaza el selector de rol simulado. | `201 { id, nombre, roles: [{ rol: "ESTUDIANTE" \| "ASISTENTE" \| "COORDINADOR_LABORATORIO" \| "COORDINADOR_SOPORTE", idLaboratorio? }] }` · `401 CREDENCIALES_INVALIDAS` · `503 DIRECTORIO_NO_DISPONIBLE` |

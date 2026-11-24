@@ -1,6 +1,6 @@
 # Prototipo navegable de CompuLab
 
-Prototipo de alta fidelidad de la navegación por rol y de las tres pantallas del núcleo ejecutable, según `docs/15-diseno-ux-ui.md`. Es HTML, CSS y JavaScript sin dependencias ni compilación; los datos son ficticios y "hoy" está fijo en el martes 24 de noviembre de 2026 a las 10:00.
+Prototipo de alta fidelidad de la navegación por rol y de las tres pantallas del núcleo ejecutable, según `docs/diseno-ux-ui.md`. Es HTML, CSS y JavaScript sin dependencias ni compilación; los datos son ficticios y "hoy" está fijo en el martes 24 de noviembre de 2026 a las 10:00.
 
 ## Cómo abrirlo
 
@@ -30,18 +30,18 @@ El control **Prototipo** (esquina inferior derecha) simula la respuesta del serv
 
 Para volver al selector de rol: menú de usuario › Cerrar sesión.
 
-## Sistema de diseño
+## Identidad visual del TEC
+
+Sigue el *Manual de Identidad Institucional del Tecnológico de Costa Rica* (2025, págs. 18-19). La justificación completa, la proporción 70/20/5/5 y la tabla de contraste están en `docs/diseno-ux-ui.md` (15.9).
 
 | Token | Valor | Uso |
 | --- | --- | --- |
-| Tinta | `#1E2B37` | Texto, menú lateral |
-| Papel | `#F2F4F5` | Fondo |
-| Linóleo | `#23675A` | Acciones, turnos asignados, horario de apertura |
-| Cinta | `#F3D36B` | Etiquetas de máquinas, estados pendientes |
-| Alerta | `#B3261E` | Errores, máquinas fuera de servicio |
-| Línea | `#CBD3D9` | Bordes |
+| Azul TEC, PANTONE 295C | `#002855` | Texto, botones, menú lateral, turnos asignados |
+| Tramas del 295C | `#1A3E66` (90 %), `#335377` (80 %), `#4D6988` (70 %), `#667E99` (60 %), `#99A9BB` (40 %), `#B3BFCC` (30 %), `#CCD4DD` (20 %) | Estados, bordes, texto secundario, selección y etiquetas de máquinas |
+| Rojo TEC, PANTONE 032C | `#EF3340` | Solo acentos: lo activo, avisos nuevos, errores, máquinas fuera de servicio |
+| Blanco | `#FFFFFF` | Fondo (≈ 70 % de la superficie) |
 
-Tipografía: **Barlow Condensed** para rótulos y horarios (como la rotulación de puertas y horarios impresos) y **Atkinson Hyperlegible** para el texto (diseñada para máxima legibilidad). El elemento distintivo es el plano del laboratorio con etiquetas de cinta en cada máquina.
+Tipografía: **Roboto**, una de las complementarias del manual. El elemento distintivo es el plano del laboratorio, con una etiqueta en trama azul pegada a cada máquina. El logotipo oficial no se incluye: se solicita a la Oficina de Comunicación y Mercadeo.
 
 ## Exportarlo a Figma
 
@@ -53,7 +53,7 @@ Figma no importa HTML por sí solo; se usa el plugin **html.to.design** (de terc
    - Entrar con el rol correspondiente y dejar la pantalla en el estado deseado (por ejemplo, la hoja de confirmación abierta o el panel de asignar turno con un asistente elegido).
    - Para vistas móviles, activar en Chrome el modo dispositivo (F12 › Toggle device toolbar) con un ancho de 390 px; para escritorio, una ventana de 1440 px.
    - Capturar la página con la extensión y abrir la captura con el plugin en Figma.
-4. En Figma, ordenar los marcos por rol y unirlos con las conexiones de *Prototype* para reproducir el flujo de `15-diseno-ux-ui.md`.
+4. En Figma, ordenar los marcos por rol y unirlos con las conexiones de *Prototype* para reproducir el flujo de `diseno-ux-ui.md`.
 
 La importación trae la estructura visual y los textos, no la interacción: los enlaces entre pantallas se rehacen en el modo Prototype de Figma. La importación por URL del plugin solo funciona con páginas publicadas en internet, por eso para este prototipo local se usa la extensión.
 

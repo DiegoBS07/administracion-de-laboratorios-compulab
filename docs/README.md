@@ -23,7 +23,7 @@ Este directorio es la **fuente oficial del diseño**. Nada se implementa en `bac
 | 11 | Trazabilidad | `12-trazabilidad.md` | Pendiente (los códigos ya están puestos para armarla) |
 | 12 | Evaluación grupal | `13-evaluacion-grupal.md` | Pendiente |
 | 13 | Bitácora individual | `14-bitacora-individual.md` | Pendiente |
-| 14 | Diseño UX/UI | `15-diseno-ux-ui.md` | Navegación por rol, rutas y flujos de las 3 pantallas del núcleo; prototipos y guía visual pendientes |
+| 14 | Diseño UX/UI | `diseno-ux-ui.md` | Navegación por rol, rutas, flujos de las 3 pantallas del núcleo, identidad visual del TEC y prototipo navegable (`prototipo/`); wireframes y evaluación heurística pendientes |
 | 15 | Diseño de BD | `16-diseno-bd.md` | Pendiente |
 
 **Lo mínimo para empezar a programar** ya está: los tres casos de uso del núcleo ejecutable (CU-06, CU-11 y CU-14) tienen escenario, extensiones, contrato con invariantes y realización interna; los módulos tienen sus interfaces; y la API que consume el frontend está definida en `08-componentes.md`.

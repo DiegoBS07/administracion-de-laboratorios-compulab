@@ -2,7 +2,7 @@
 
 > Responde: ¿cómo se mueve cada actor por CompuLab, qué ve primero, por qué se organizó así y qué pasa en pantalla cuando algo falla?
 > Criterios: presentaciones de UX/UI del curso (conceptos de usabilidad, heurísticas de Nielsen y leyes de diseño, componentes de UI).
-> Versión 2026-11-24. Esta primera parte cubre la **arquitectura de información y el flujo de navegación**. El prototipo navegable está en `docs/prototipo/` (15.9); la guía visual completa y la evaluación heurística se agregarán después (15.10).
+> Versión 2026-11-24. Esta primera parte cubre la **arquitectura de información y el flujo de navegación**. La identidad visual del TEC está en 15.9 y el prototipo navegable en `docs/prototipo/` (15.10); la guía visual completa y la evaluación heurística se agregarán después (15.11).
 
 ## 15.1 Principios de navegación
 
@@ -249,13 +249,70 @@ En el núcleo no hay Directorio real. `/ingresar` muestra tarjetas con usuarios 
 | Error interno (`500`) | Mensaje genérico con el número de la solicitud (`idSolicitud`) para reportarlo | Heurística 9; trazas correlacionadas |
 | Lista vacía | Texto que explica por qué está vacía y qué hacer (por ejemplo, "No hay laboratorios abiertos este día; prueba otro día") | Heurística 1 |
 
-## 15.9 Prototipo
+## 15.9 Identidad visual institucional
 
-El prototipo navegable de alta fidelidad está en `docs/prototipo/` (instrucciones, sistema de diseño y exportación a Figma en su `README.md`). Implementa el selector de rol simulado, el esqueleto por rol de 15.2 a 15.4 y los tres flujos de 15.6, con un control para simular respuestas del servidor (normal, conflicto y sin respuesta).
+CompuLab es una aplicación del Tecnológico de Costa Rica, así que usa la identidad del TEC. Fuente: *Manual de Identidad Institucional del Tecnológico de Costa Rica*, Oficina de Comunicación y Mercadeo, versión de enero de 2025, páginas 16 a 19 y 72 a 73.
 
-## 15.10 Pendiente en esta sección
+### Lo que dice el manual
+| Tema | Regla del manual | Página |
+| --- | --- | --- |
+| Color corporativo | PANTONE® 295C. Se puede tramar hasta el 20 %. | 19 |
+| Color complementario | PANTONE® 032C. Su uso "no debe ser excesivo". | 19, 54 |
+| Proporción | En un material de comunicación: cerca de 70 % blanco, 20 % azul, 5 % rojo y 5 % otros colores. | 19 |
+| Otros colores | Evitar el rojo, el cian y la combinación amarillo y azul en proporciones significativas: son la identidad de otras universidades estatales. | 19, 72 |
+| Tipografía | Complementarias: Arial, Calibri, Century Gothic, Helvética y Roboto; usar una o dos por material. | 18 |
+| Logotipo | Solo sobre fondos sólidos negro, azul, gris o blanco; no se cambian sus colores ni se le aplican efectos. | 16, 72, 73 |
+| Web | Las normas de presencia web están en el "Manual de Web Institucional", disponible por medio de la Oficina de Comunicación y Mercadeo. | 69 |
+
+### Paleta de CompuLab
+| Token | Color | Valor | Uso en la aplicación |
+| --- | --- | --- | --- |
+| `--azul` | Azul TEC, PANTONE 295C al 100 % | `#002855` (R 0, G 40, B 85) | Texto, botones principales, menú lateral, turnos asignados, encabezados de tabla |
+| `--azul-90` | Trama 90 % | `#1A3E66` | Paso del cursor sobre botones y elemento activo del menú |
+| `--azul-80` | Trama 80 % | `#335377` | Texto secundario |
+| `--azul-70` | Trama 70 % | `#4D6988` | Texto de apoyo (fechas, carné, leyendas) |
+| `--azul-60` | Trama 60 % | `#667E99` | Borde de controles de formulario, elementos deshabilitados |
+| `--azul-40` | Trama 40 % | `#99A9BB` | Texto tenue sobre el menú azul |
+| `--azul-30` | Trama 30 % | `#B3BFCC` | Bordes de tarjetas y tablas |
+| `--azul-20` | Trama 20 % (mínima permitida) | `#CCD4DD` | Selección, etiquetas de máquinas, filas resaltadas, mensajes informativos |
+| `--rojo` | Rojo TEC, PANTONE 032C | `#EF3340` (R 239, G 51, B 64) | Solo acentos: línea bajo la marca, elemento activo, aviso nuevo, máquina fuera de servicio, error, "requiere atención" |
+| `--blanco` | Blanco | `#FFFFFF` | Fondo de todas las pantallas |
+
+Las tramas se calcularon mezclando el 295C con blanco en el porcentaje indicado. No se usa ninguna trama por debajo del 20 % ni otro color fuera de la paleta: el verde y el amarillo del primer prototipo se retiraron porque el amarillo junto al azul es una de las combinaciones que el manual pide evitar.
+
+### Cómo se respeta la proporción 70 / 20 / 5 / 5
+- **Blanco (≈ 70 %):** fondo de todas las pantallas, tarjetas y tablas.
+- **Azul (≈ 20 %):** menú lateral en escritorio, texto, botones principales y bloques de turnos.
+- **Rojo (≈ 5 %):** nunca como relleno grande; solo líneas, puntos y bordes que señalan lo activo o lo que requiere atención.
+- **Otros (≈ 5 %):** ninguno; las variaciones salen de las tramas del azul.
+
+### Tipografía
+**Roboto** en toda la aplicación (400 para texto, 500 para énfasis suave, 700 para títulos y 900 para cifras y la marca). Es una de las tipografías complementarias del manual, está disponible en Google Fonts y en Figma, y tiene buena legibilidad en pantalla.
+
+### Logotipo
+El prototipo **no** reproduce el logotipo del TEC: escribe "Tecnológico de Costa Rica" en texto. Para la versión final se debe solicitar el archivo oficial a la Oficina de Comunicación y Mercadeo y colocarlo sobre blanco o sobre el azul del menú, sin modificarlo.
+
+### Contraste (WCAG 2.2)
+| Combinación | Contraste | Uso | Cumple |
+| --- | --- | --- | --- |
+| Azul 100 % sobre blanco | 14,6 : 1 | Texto normal | AA y AAA |
+| Azul 80 % sobre blanco | 7,9 : 1 | Texto secundario | AA y AAA |
+| Azul 70 % sobre blanco | 5,7 : 1 | Texto de apoyo | AA |
+| Azul 100 % sobre trama 20 % | 9,8 : 1 | Texto sobre selección | AA y AAA |
+| Trama 20 % sobre azul 100 % | 9,8 : 1 | Texto del menú lateral | AA y AAA |
+| Azul 60 % sobre blanco | 4,2 : 1 | Bordes de controles y elementos deshabilitados | AA para componentes (mínimo 3 : 1) |
+| Rojo 032C sobre blanco | 4,0 : 1 | Solo marcas gráficas, nunca texto | AA para elementos gráficos (mínimo 3 : 1) |
+
+El rojo no se usa para texto, porque a 4,0 : 1 no alcanza el 4,5 : 1 que exige el texto normal. Por eso los errores se escriben en azul y se marcan con una barra o un punto rojo. Además, ningún estado depende solo del color: cada uno tiene una forma distinta (punto lleno, círculo vacío o cuadro rojo) y su texto.
+
+## 15.10 Prototipo
+
+El prototipo navegable de alta fidelidad está en `docs/prototipo/` (instrucciones, paleta y exportación a Figma en su `README.md`). Implementa el selector de rol simulado, el esqueleto por rol de 15.2 a 15.4, los tres flujos de 15.6 y la identidad visual de 15.9, con un control para simular respuestas del servidor (normal, conflicto y sin respuesta).
+
+## 15.11 Pendiente en esta sección
 - Prototipos de baja fidelidad (wireframes) para documentar la evolución del diseño.
-- Guía visual completa: grilla y componentes (Atomic Design); los tokens de color y tipografía ya están en `docs/prototipo/README.md`.
-- Accesibilidad: contraste y textos alternativos según WCAG 2.2.
+- Guía visual completa: grilla y componentes (Atomic Design).
+- Accesibilidad: textos alternativos y revisión con lector de pantalla según WCAG 2.2 (el contraste ya está en 15.9).
+- Confirmar con la Oficina de Comunicación y Mercadeo las reglas del "Manual de Web Institucional" y obtener el logotipo oficial.
 - Evaluación heurística de los prototipos y plan de medición (tasa de éxito, tiempo en tarea y cuestionario SUS).
 - Justificación de cada decisión visual con heurísticas y leyes.

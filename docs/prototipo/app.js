@@ -1,5 +1,5 @@
 /* CompuLab · prototipo navegable
-   Implementa la navegación por rol de docs/15-diseno-ux-ui.md con rutas por hash (#/ruta),
+   Implementa la navegación por rol de docs/diseno-ux-ui.md con rutas por hash (#/ruta),
    para que funcione abriendo index.html directamente y cada pantalla tenga su propia URL. */
 (function () {
   "use strict";
@@ -240,7 +240,7 @@
         (i.ruta === "/laboratorios" && ruta.indexOf("/laboratorios/") === 0 && tiene("COORDINADOR_SOPORTE"));
     };
 
-    var lateral = '<nav class="lateral" aria-label="Navegación principal"><div class="lateral__marca">CompuLab</div>';
+    var lateral = '<nav class="lateral" aria-label="Navegación principal"><div class="lateral__marca"><strong>CompuLab</strong><span>Escuela de Computación, Tecnológico de Costa Rica</span></div>';
     var seccion = null;
     nav.forEach(function (i) {
       if (i.seccion && i.seccion !== seccion) { seccion = i.seccion; lateral += '<div class="lateral__seccion">' + seccion + "</div>"; }
@@ -257,7 +257,7 @@
     var noLeidos = avisosDe(u).length;
     var cabecera = '<header class="cabecera">' +
       '<div class="cabecera__titulo">' + (vista.migas ? '<div class="migas">' + vista.migas + "</div>" : "") + "<h1>" + esc(vista.titulo) + "</h1></div>" +
-      '<a class="icono-boton" href="#/avisos" aria-label="Avisos, ' + noLeidos + ' nuevos">' + icono("campana") + '<span class="contador">' + noLeidos + "</span></a>" +
+      '<a class="icono-boton" href="#/avisos" aria-label="Avisos, ' + noLeidos + ' nuevos">' + icono("campana") + (noLeidos ? '<span class="contador" aria-hidden="true"></span>' : "") + "</a>" +
       '<div class="usuario"><button class="icono-boton" data-accion="menu-usuario" aria-expanded="false" aria-label="Menú de ' + esc(u.nombre) + '">' + icono("usuario") + "</button>" +
       '<div class="usuario__menu" hidden><p>' + esc(u.nombre) + "</p><small>" + u.roles.map(function (r) { return NOMBRE_ROL[r]; }).join(" y ") + "</small>" +
       '<button class="boton boton--secundario boton--ancho" data-accion="salir">Cerrar sesión</button></div></div>' +
@@ -278,7 +278,9 @@
 
   function vIngresar() {
     return '<main class="ingreso"><div class="ingreso__caja">' +
-      '<h1 class="ingreso__marca">CompuLab<span>Laboratorios de la Escuela de Computación</span></h1>' +
+      '<p class="ingreso__institucion">Tecnológico de Costa Rica</p>' +
+      '<h1 class="ingreso__marca">CompuLab</h1>' +
+      '<p class="ingreso__sub">Laboratorios de la Escuela de Computación</p>' +
       '<p class="ingreso__nota">Este prototipo no se conecta al directorio institucional. Elige con quién entrar para recorrer la aplicación como ese rol.</p>' +
       '<ul class="directorio">' + D.usuarios.map(function (u) {
         return '<li><button data-accion="entrar" data-usuario="' + u.id + '">' +

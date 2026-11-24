@@ -183,5 +183,5 @@ Leyenda: óvalo = raíz; rectángulo = característica ISO 25010 o escenario (ho
 | QA-5 | Tarifas y recargo como datos con vigencia; copia en cada cierre | ADR-0005 |
 | QA-6 | Puertos y adaptadores; reloj inyectado; funciones de aptitud | ADR-0001, `07-arquitectura.md` (7.5) |
 | QA-7 | Verificación de rol y laboratorio en cada caso de uso; bitácora de seguridad con identificador de solicitud | `08-componentes.md`, `07-arquitectura.md` (7.8) |
-| QA-8 | Diseño móvil primero para la vista del asistente | `15-diseno-ux-ui.md` (pendiente) |
+| QA-8 | Diseño móvil primero para la vista del asistente | `diseno-ux-ui.md` (pendiente) |
 | QA-9 | Tiempo de espera, un reintento con espera aleatoria, interruptor, fallar cerrado, sesión propia | ADR-0008, ADR-0011, `08-componentes.md` |

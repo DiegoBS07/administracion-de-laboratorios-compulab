@@ -121,7 +121,7 @@ frontend/src/
 └── app/                          rutas, sesión y selección de rol
 ```
 
-Las rutas, el menú de cada rol y los flujos de pantalla están definidos en `15-diseno-ux-ui.md`.
+Las rutas, el menú de cada rol y los flujos de pantalla están definidos en `diseno-ux-ui.md`.
 
 Patrón *Humble Object*: el **presentador** convierte la respuesta de la API en un modelo de vista (fechas legibles, colones formateados, mensajes de error en lenguaje sencillo) y se prueba sin renderizar; la **vista** (componente React) solo muestra el modelo de vista.
 

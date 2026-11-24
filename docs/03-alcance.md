@@ -58,7 +58,7 @@ Fuera del núcleo ejecutable (se diseña, no se programa): todo lo demás de 3.1
 | Reservar máquina | Estudiante | Selección de laboratorio y día; franjas abiertas; máquinas libres y fuera de servicio; formulario de reserva; mensajes por cada regla (más de 2 h, ya tiene una activa, superaría 6 h, laboratorio cerrado en esa franja). | CU-11 |
 | Cierre mensual | Coordinador de soporte | Mes a cerrar; resultado por asistente (horas normales, con recargo, no pagadas y monto); horas sobre el tope destacadas; descarga del CSV. | CU-14 |
 
-La navegación por rol, las rutas y el flujo de cada una de estas pantallas están en `15-diseno-ux-ui.md`; los prototipos y su justificación se agregarán ahí.
+La navegación por rol, las rutas y el flujo de cada una de estas pantallas están en `diseno-ux-ui.md`; los prototipos y su justificación se agregarán ahí.
 
 ## 3.5 Supuestos de interpretación
 
