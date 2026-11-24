@@ -28,8 +28,6 @@ Este directorio es la **fuente oficial del diseño**. Nada se implementa en `bac
 
 **Lo mínimo para empezar a programar** ya está: los tres casos de uso del núcleo ejecutable (CU-06, CU-11 y CU-14) tienen escenario, extensiones, contrato con invariantes y realización interna; los módulos tienen sus interfaces; y la API que consume el frontend está definida en `08-componentes.md`.
 
-**Revisiones:** las actas están en `revisiones/`, con cada hallazgo, su severidad y dónde se cerró.
-
 ## Convenciones de códigos
 
 | Prefijo | Significado | Dónde se define |
@@ -45,7 +43,6 @@ Este directorio es la **fuente oficial del diseño**. Nada se implementa en `bac
 | `FA-` | Función de aptitud | `07-arquitectura.md` |
 | `P` / `I` | Poscondición / invariante de un contrato | `04-casos-de-uso.md` |
 | `RA-`, `NR-`, `S-`, `C-` | Riesgo, no-riesgo, sensibilidad y compromiso (ATAM) | `05-atributos-de-calidad.md` |
-| `H-` | Hallazgo de una revisión de diseño | `revisiones/` |
 
 Los códigos se citan tal cual en el código (`// RN-07`, `// CU-06 paso 3`, `// ext 4a`) y en los nombres de las pruebas, para que la trazabilidad salga sola.
 

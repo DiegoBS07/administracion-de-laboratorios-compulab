@@ -130,7 +130,7 @@ Patrón *Humble Object*: el **presentador** convierte la respuesta de la API en 
 | Directorio | Contenido |
 | --- | --- |
 | `database/migrations/` | Scripts Flyway `V1__descripcion.sql`, `V2__…`. Única fuente del esquema. |
-| `docs/` | Este documento de diseño; `docs/adr/` con las decisiones y `docs/revisiones/` con las actas de revisión. |
+| `docs/` | Este documento de diseño, `docs/adr/` con las decisiones y `docs/prototipo/` con el prototipo navegable. |
 
 ## 7.4 Regla de dependencias
 
