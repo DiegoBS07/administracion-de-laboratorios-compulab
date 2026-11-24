@@ -1,0 +1,23 @@
+{
+  "name": "compulab-backend",
+  "version": "0.1.0",
+  "description": "Backend de CompuLab: monolito modular con puertos y adaptadores (docs/07-arquitectura.md).",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verificar": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}
