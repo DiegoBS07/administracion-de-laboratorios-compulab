@@ -318,4 +318,36 @@ describe.each(MODOS)("API con persistencia en %s", (modo) => {
       expect(codigo(await pedir(soporte, "GET", "/api/v1/cierres/2026/13"))).toEqual([400, "SOLICITUD_INVALIDA"]);
     });
   });
+
+  describe("apoyo a la interfaz", () => {
+    it("GET /api/v1/hora da la hora oficial del servidor, sin sesión (8.3)", async () => {
+      const respuesta = await app.inject({ method: "GET", url: "/api/v1/hora" });
+
+      expect(respuesta.json()).toEqual({ ahora: AHORA });
+    });
+
+    it("GET /api/v1/reservas/mias da la reserva activa y los minutos de la semana (apoyo a CU-11, 15.6)", async () => {
+      const luis = await ingresar("luis.estudiante");
+      const coordinadora = await ingresar("marta.coordinadora");
+
+      const mias = (await pedir(luis, "GET", "/api/v1/reservas/mias")).json<{
+        semana: string;
+        minutosReservadosSemana: number;
+        limiteSemanalMinutos: number;
+        activa: { codigoMaquina: string; idLaboratorio: string; limitePresentacion: string } | null;
+        deLaSemana: unknown[];
+      }>();
+
+      expect(mias).toMatchObject({ semana: SEMANA, minutosReservadosSemana: 120, limiteSemanalMinutos: 360 });
+      expect(mias.activa).toMatchObject({ codigoMaquina: "C1-02", idLaboratorio: "c1", limitePresentacion: MIERCOLES + "T08:15:00-06:00" });
+      expect(mias.deLaSemana).toHaveLength(1);
+      expect(codigo(await pedir(coordinadora, "GET", "/api/v1/reservas/mias"))).toEqual([403, "SIN_PERMISO"]);
+    });
+
+    it("los usuarios de demostración traen su descripción para el selector", async () => {
+      const usuarios = (await app.inject({ method: "GET", url: "/api/v1/sesion/usuarios-de-demostracion" })).json<{ usuario: string; descripcion: string }[]>();
+
+      expect(usuarios.find((u) => u.usuario === "carlos.soporte")?.descripcion).toMatch(/cierra el mes/);
+    });
+  });
 });
