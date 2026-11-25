@@ -308,7 +308,7 @@ Leyenda: recuadro exterior = servidor físico; recuadro interior = red de Docker
 
 ## 7.11 Modelo de datos (PostgreSQL 14)
 
-El esquema vive solo en `database/migrations/` (Flyway, V1 a V6) y los tipos de Kysely en `backend/src/compartido/infraestructura/postgres/esquema.ts` lo reflejan.
+El esquema vive solo en `database/migrations/` (Flyway, V1 a V6) y los tipos de Kysely en `backend/src/compartido/infraestructura/postgres/esquema.ts` lo reflejan. El detalle (diccionario de datos, tipos, índices y operación) está en `16-diseno-bd.md`.
 
 ```mermaid
 ---

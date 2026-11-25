@@ -176,7 +176,7 @@ Leyenda: óvalo = raíz; rectángulo = característica ISO 25010 o escenario (ho
 
 | QA | Tácticas | Dónde se ve |
 | --- | --- | --- |
-| QA-1 | Índices por asistente-fecha, laboratorio-fecha y máquina-fecha; transacciones cortas; presupuesto de latencia | `07-arquitectura.md` (7.6 y 7.11) y `database/migrations/` |
+| QA-1 | Índices por asistente-fecha, laboratorio-fecha y máquina-fecha; transacciones cortas; presupuesto de latencia | `07-arquitectura.md` (7.6) y `16-diseno-bd.md` (16.7) |
 | QA-2 | `restart: unless-stopped`, healthchecks, volumen persistente, respaldo diario, tareas que procesan lo pendiente | `docker-compose.yml`, ADR-0003, ADR-0004 |
 | QA-3 | Base de datos y contenedores dedicados, límites de memoria, sesión propia | `07-arquitectura.md`, ADR-0008 |
 | QA-4 | Bloqueo por asistente, restricciones `EXCLUDE` y de unicidad, transacción por caso de uso, claves de solicitud | ADR-0009, ADR-0010 |

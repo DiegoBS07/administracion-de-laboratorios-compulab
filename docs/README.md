@@ -19,12 +19,12 @@ Este directorio es la **fuente oficial del diseño**. Nada se implementa en `bac
 | 7 | Componentes | `08-componentes.md` | C4 nivel 3, prueba de reemplazo, contratos y API de los 3 casos de uso |
 | 8 | Clases | `09-clases.md` | Núcleo compartido (9.1), horarios (9.2), reservas (9.3), liquidación (9.4) e identidad (9.5) implementados |
 | 9 | Comportamiento | `10-comportamiento.md` | Realización interna de CU-06, CU-11 y CU-14; máquinas de estado de Turno y Reserva |
-| 10 | Patrones | `11-patrones.md` | Pendiente |
+| 10 | Patrones | `11-patrones.md` | GRASP, arquitectura, dominio, persistencia y concurrencia, integración, presentación y pruebas; cada uno con su problema, dónde está y su costo, y los descartados |
 | 11 | Trazabilidad | `12-trazabilidad.md` | Matriz del núcleo: alcance, RF y RN, contratos, QA y restricciones del curso hasta el código y las pruebas |
 | 12 | Evaluación grupal | `13-evaluacion-grupal.md` | Pendiente |
 | 13 | Bitácora individual | `14-bitacora-individual.md` | Pendiente |
 | 14 | Diseño UX/UI | `diseno-ux-ui.md` | Navegación por rol, rutas, flujos de las 3 pantallas del núcleo, identidad visual del TEC, prototipo navegable (`prototipo/`) y su implementación en `frontend/`; wireframes y evaluación heurística pendientes |
-| 15 | Diseño de BD | `16-diseno-bd.md` | Pendiente como documento propio; el modelo de datos implementado está en `07-arquitectura.md` (7.11) y `database/migrations/` |
+| 15 | Diseño de BD | `16-diseno-bd.md` | Principios, modelo entidad-relación, diccionario de datos, restricciones de integridad y concurrencia, tipos, desnormalizaciones, índices y operación |
 
 **Lo mínimo para empezar a programar** ya está: los tres casos de uso del núcleo ejecutable (CU-06, CU-11 y CU-14) tienen escenario, extensiones, contrato con invariantes y realización interna; los módulos tienen sus interfaces; y la API que consume el frontend está definida en `08-componentes.md`.
 

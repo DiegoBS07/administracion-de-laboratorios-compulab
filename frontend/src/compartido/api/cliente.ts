@@ -42,6 +42,7 @@ export interface OpcionesDePedido {
 
 type Pedir = (entrada: string, init: RequestInit) => Promise<Response>;
 
+/** Esperas base de los dos reintentos; cada una se multiplica por un factor aleatorio entre 0,5 y 1,5 para que los reintentos de muchos usuarios no lleguen todos al mismo tiempo. */
 const ESPERAS_DE_REINTENTO_MS = [600, 1500];
 const ESTADOS_TRANSITORIOS = new Set([502, 503, 504]);
 
@@ -53,7 +54,12 @@ export interface ClienteApi {
   alPerderSesion: (() => void) | null;
 }
 
-export function crearClienteApi(pedir: Pedir = (e, i) => fetch(e, i), esperar = (ms: number) => new Promise((r) => setTimeout(r, ms))): ClienteApi {
+export function crearClienteApi(
+  pedir: Pedir = (e, i) => fetch(e, i),
+  esperar = (ms: number) => new Promise((r) => setTimeout(r, ms)),
+  aleatorio: () => number = Math.random
+): ClienteApi {
+  const espera = (intento: number) => (ESPERAS_DE_REINTENTO_MS[intento] ?? 0) * (0.5 + aleatorio());
   const cliente: ClienteApi = {
     alPerderSesion: null,
     get: (ruta) => enviar("GET", ruta, {}),
@@ -83,14 +89,14 @@ export function crearClienteApi(pedir: Pedir = (e, i) => fetch(e, i), esperar = 
       } catch {
         if (reintentable && intento < ESPERAS_DE_REINTENTO_MS.length) {
           opciones.alReintentar?.();
-          await esperar(ESPERAS_DE_REINTENTO_MS[intento] ?? 0);
+          await esperar(espera(intento));
           continue;
         }
         throw new SinRespuesta();
       }
       if (ESTADOS_TRANSITORIOS.has(respuesta.status) && reintentable && intento < ESPERAS_DE_REINTENTO_MS.length) {
         opciones.alReintentar?.();
-        await esperar(ESPERAS_DE_REINTENTO_MS[intento] ?? 0);
+        await esperar(espera(intento));
         continue;
       }
       return interpretar<T>(respuesta, ruta);

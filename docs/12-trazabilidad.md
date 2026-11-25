@@ -5,7 +5,7 @@
 
 Los códigos se citan tal cual en el código (`// RN-07`, `// CU-06 paso 4`, `// ext 4a`) y en los nombres de las pruebas (`"4c · rechaza un turno que haría superar el tope semanal…"`). Por eso esta matriz se puede reconstruir buscando el código en `backend/`, `frontend/` y `database/`. Todas las rutas de archivo son relativas a la raíz del repositorio.
 
-Pruebas al cerrar la implementación: en el backend, **234 sin base de datos**; con `APP_DB_PRUEBAS` se suman las 17 de los repositorios PostgreSQL y la API completa vuelve a correr sobre la base, **277 en total**. En el frontend, **30**.
+Pruebas al cerrar la implementación: en el backend, **234 sin base de datos**; con `APP_DB_PRUEBAS` se suman las 17 de los repositorios PostgreSQL y la API completa vuelve a correr sobre la base, **277 en total**. En el frontend, **35**.
 
 ## 12.1 Del alcance a las pruebas
 
@@ -104,7 +104,7 @@ Cada extensión de las tablas de `04-casos-de-uso.md` (11 de CU-06, 12 de CU-11 
 | QA-7 Autorización | Puerto `Autorizacion` en CU-06; rol exigido en cada ruta; rutas protegidas en el frontend; bitácora de accesos denegados | `horarios/aplicacion/asignar-turno.ts`, `compartido/infraestructura/http.ts`, `frontend/src/app/vistas-generales.tsx` | `asignar-turno.test.ts` 2a; `api.test.ts` (403 en cada módulo); `app/navegacion.test.ts` |
 | QA-5 Modificabilidad | Tarifas como datos con vigencia; copia en cada cierre (ADR-0005) | `vigencias_tarifas`, `TarifasDelPeriodo` | `cerrar-mes.test.ts` P5, 5c |
 | QA-8 Uso en móvil | Pantallas del estudiante diseñadas primero para celular; objetivos táctiles de 44 px | `frontend/src/compartido/ui/estilos.css` | Revisado en el navegador a 375 px en la sección 8 |
-| QA-1 Tiempo de respuesta | Índices por fecha; transacciones cortas | `database/migrations/` | Sin medición de carga en el núcleo (pendiente) |
+| QA-1 Tiempo de respuesta | Índices por responsable, laboratorio y máquina; transacciones cortas | `database/migrations/`, `16-diseno-bd.md` (16.7) | Sin medición de carga en el núcleo (pendiente) |
 | QA-3 Picos externos | Base y contenedores dedicados, límites de memoria | `docker-compose.yml` | Configuración; sin prueba de carga |
 
 ## 12.6 Restricciones del curso
