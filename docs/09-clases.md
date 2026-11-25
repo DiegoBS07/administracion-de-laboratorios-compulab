@@ -2,7 +2,7 @@
 
 > Responde: ¿qué clases tiene el dominio, qué invariantes protegen y quién usa a quién?
 > Reglas de construcción (R-7): atributos privados (`#campo`), constructor privado y fábricas estáticas que verifican las invariantes antes de crear el objeto; los objetos valor son inmutables. Nada de modelo anémico: la regla vive en la clase que tiene los datos.
-> Versión 2026-11-24. Se completa sección por sección de la implementación: 9.1, 9.2 y 9.3 están implementadas; 9.4 se escribe al empezar la sección 5.
+> Versión 2026-11-24. Se completa sección por sección de la implementación: 9.1 a 9.4 están implementadas.
 
 ## 9.1 Núcleo compartido (`backend/src/compartido/dominio/`)
 
@@ -280,5 +280,129 @@ Leyenda: igual que 9.1 y 9.2; `<<constantes>>` = límites de uso agrupados en un
 
 **Dobles de prueba:** `tests/modulos/reservas/dobles.ts` (repositorio de reservas con esas restricciones, repositorio de máquinas y `CoberturaFija`), más los dobles comunes de `tests/dobles/`.
 
-## 9.4 Módulo liquidación (CU-14)
-Pendiente: sección 5. Clases previstas: `MesDeLiquidacion`, `TarifasDelPeriodo`, `LiquidacionDelAsistente`, `LineaDeLiquidacion`, `CierreMensual`.
+## 9.4 Módulo liquidación (CU-14) · `backend/src/modulos/liquidacion/`
+
+```mermaid
+---
+title: CompuLab · Clases del módulo liquidación (CU-14) · 2026-11-24
+---
+classDiagram
+    direction LR
+    class CerrarMes {
+        <<aplicación>>
+        +ejecutar(anio, mes) ResultadoCerrarMes
+    }
+    class ConsultarCierre {
+        <<aplicación>>
+        +ejecutar(anio, mes) ResumenDeCierreDTO
+    }
+    class ObtenerArchivoBecas {
+        <<aplicación>>
+        +ejecutar(anio, mes) ArchivoDTO
+    }
+    class MesDeLiquidacion {
+        -anio
+        -mes
+        +de(anio, mes)$ MesDeLiquidacion
+        +clave: string
+        +primerDia: Fecha
+        +ultimoDia: Fecha
+        +contiene(fecha) boolean
+        +terminoAntesDe(instante) boolean
+        +periodoDeCalculo() Franja
+    }
+    class TarifasDelPeriodo {
+        -vigencias: VigenciaDeTarifas[]
+        +de(vigencias)$ TarifasDelPeriodo
+        +exigirCobertura(desde, hasta)
+        +tarifaPorHora(categoria, fecha) Dinero
+        +porcentajeRecargo(fecha) number
+    }
+    class TurnoTrabajado {
+        -idTurno
+        -idAsistente
+        -programado: Franja
+        -entrada
+        -salida
+        +de(datos)$ TurnoTrabajado
+        +llevaRecargo() boolean
+        +minutosTrabajados() number
+        +minutosConMarcaIncompleta() number
+    }
+    class LiquidacionDelAsistente {
+        -asistente
+        -topes: TopeVigente[]
+        +de(asistente)$ LiquidacionDelAsistente
+        +calcular(turnos, mes, tarifas) LineaDeLiquidacion
+    }
+    class LineaDeLiquidacion {
+        -minutosNormales
+        -minutosConRecargo
+        -noPagados: HorasNoPagadas[]
+        -monto: Dinero
+        +de(datos)$ LineaDeLiquidacion
+        +minutosNoPagados: number
+        +tieneHorasSobreElTope() boolean
+    }
+    class CierreMensual {
+        -mes: MesDeLiquidacion
+        -lineas: LineaDeLiquidacion[]
+        -tarifasAplicadas
+        -fechaDeCierre: Instante
+        -archivo: Archivo
+        +cerrar(datos)$ CierreMensual
+        +reconstituir(datos)$ CierreMensual
+        +total: Dinero
+        +adjuntarArchivo(archivo) CierreMensual
+    }
+    class GeneradorArchivoBecasCsv {
+        <<infraestructura>>
+        +generar(cierre) Archivo
+    }
+    class RepositorioCierres { <<interface>> }
+    class HorasTrabajadas { <<interface>> }
+    class DatosDeAsistentes { <<interface>> }
+    class TablaTarifas { <<interface>> }
+    class GeneradorArchivoBecas { <<interface>> }
+    class Notificador { <<interface>> }
+    CerrarMes ..> MesDeLiquidacion : pide verificar
+    CerrarMes ..> TarifasDelPeriodo : crea
+    CerrarMes ..> LiquidacionDelAsistente : pide calcular
+    CerrarMes ..> CierreMensual : crea
+    CerrarMes --> RepositorioCierres
+    CerrarMes --> HorasTrabajadas
+    CerrarMes --> DatosDeAsistentes
+    CerrarMes --> TablaTarifas
+    CerrarMes --> GeneradorArchivoBecas
+    CerrarMes --> Notificador
+    ConsultarCierre --> RepositorioCierres
+    ObtenerArchivoBecas --> RepositorioCierres
+    LiquidacionDelAsistente ..> TurnoTrabajado
+    LiquidacionDelAsistente ..> TarifasDelPeriodo
+    LiquidacionDelAsistente ..> LineaDeLiquidacion : crea
+    CierreMensual *-- LineaDeLiquidacion
+    CierreMensual --> MesDeLiquidacion
+    GeneradorArchivoBecasCsv ..|> GeneradorArchivoBecas
+```
+
+Leyenda: igual que 9.1 a 9.3; `<<infraestructura>>` = adaptador que implementa un puerto. `CerrarMes` también usa el puerto `Reloj`.
+
+| Clase | Responsabilidad | Invariantes verificadas al crear | Errores que lanza | Reglas |
+| --- | --- | --- | --- | --- |
+| `MesDeLiquidacion` | El mes que se liquida y su periodo de cálculo | Mes de 1 a 12; año entre 1970 y 9998 | `DatoInvalido` | Ext 2b (termina a las 00:00 del día 1 siguiente), SUP-05 (el periodo empieza el lunes de la semana del día 1) |
+| `TarifasDelPeriodo` | Elige la tarifa y el recargo vigentes en la fecha de cada turno | Cada vigencia termina después de empezar, tiene al menos una tarifa y un recargo entero ≥ 0; no hay traslapes | `TarifaNoDefinida`, `DatoInvalido` | RN-22, RN-23, SUP-17, ext 5b, 5c |
+| `TurnoTrabajado` | Un turno con sus marcas; sabe cuánto se trabajó y si lleva recargo | Franja programada válida; no hay salida sin entrada; la salida es posterior a la entrada | `DatoInvalido` | RN-12, SUP-06 (un solo recargo), SUP-07 (intersección con lo programado), SUP-08 (marca incompleta) |
+| `LiquidacionDelAsistente` | Calcula la línea de un asistente: recorre cada semana en orden, paga hasta el tope y aplica la tarifa y el recargo de cada fecha | Datos del asistente no vacíos; al menos un tope, todos enteros > 0 | `TarifaNoDefinida`, `DatoInvalido` | RN-24, RN-27, RF-07 (tope vigente el lunes de cada semana), ext 3a–3c, 4a, 4b, 5a, 5c |
+| `LineaDeLiquidacion` | Lo que se le paga a un asistente por el mes y lo que no se paga, por semana y motivo | Datos del asistente no vacíos; minutos enteros ≥ 0; cada grupo no pagado > 0; al menos un minuto en total | `DatoInvalido` | P3, P4, SUP-26 |
+| `CierreMensual` | El cierre del mes: líneas, tarifas aplicadas, fecha y archivo. Inmutable | Se cierra después de terminado el mes; a lo sumo una línea por asistente; el archivo se adjunta una sola vez | `DatoInvalido` | P1, P2, P5–P7, I2, I3 (el total siempre es la suma de las líneas), RN-25 |
+| `CerrarMes` (aplicación) | Coordina CU-14 paso por paso | — | `MesNoTerminado`, `TarifaNoDefinida`, `ErrorAlGenerarArchivo` | CU-14, RN-26, ext 2a, 2c, 7a, P8 |
+| `ConsultarCierre`, `ObtenerArchivoBecas` (aplicación) | Consultas de un cierre hecho; no cambian nada | — | `CierreNoExiste` | RF-32 (descargar el archivo) |
+| `GeneradorArchivoBecasCsv` (infraestructura) | Traduce el cierre al CSV de Becas: CRLF y comillas según RFC 4180, filas ordenadas por carné, horas y colones con dos decimales calculados con enteros, y textos que empiezan con `=`, `+`, `-` o `@` precedidos de un apóstrofo para que una hoja de cálculo no los ejecute | — | `ErrorAlGenerarArchivo` | SUP-03, RF-32, capa anticorrupción |
+
+**Cálculo del monto (RN-27):** el numerador acumula `tarifa en céntimos × minutos pagables × (100 + recargo)` de cada turno y se divide una sola vez entre 6000 (60 minutos × 100 %), con redondeo a la mitad hacia arriba. Así no se pierden céntimos por redondear turno por turno.
+
+**Concurrencia (ADR-0009):** liquidación no necesita bloqueo. Con la restricción `UNIQUE (anio, mes)`, el segundo de dos cierres simultáneos falla al guardar con `CierreYaExiste`; `CerrarMes` lo atrapa y devuelve el cierre que ganó (ext 2c), sin repetir el aviso.
+
+**Garantía mínima:** el archivo se genera antes de guardar y `guardar` es todo o nada, así que un fallo del generador (ext 7a) o una tarifa faltante (ext 5b) dejan el mes sin cerrar. El aviso `CIERRE_LISTO` va de último.
+
+**Dobles de prueba:** `tests/modulos/liquidacion/dobles.ts` (repositorio de cierres con la restricción única, horas, asistentes, tarifas, un generador que falla y la ayuda `turno`), más los dobles comunes de `tests/dobles/`.

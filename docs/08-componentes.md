@@ -184,12 +184,12 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 ### Interfaces requeridas
 | Puerto | Operaciones | Para qué |
 | --- | --- | --- |
-| `RepositorioCierres` | `porMes(anio, mes): CierreMensual \| null`; `guardar(cierre): void` | RN-25, RN-26, garantía mínima. `guardar` es todo o nada; si ya existe un cierre del mes (ext 2c), lanza `CierreYaExiste` y el caso de uso devuelve el existente. |
-| `HorasTrabajadas` | `delPeriodo(desde, hasta): TurnoTrabajadoDTO[]` → `{ idAsistente, idTurno, inicioProgramado, finProgramado, entrada?, salida?, estado }` | Pasos 3 y 4. El periodo empieza el lunes de la primera semana del mes (SUP-05). |
+| `RepositorioCierres` | `porMes(mes: MesDeLiquidacion): CierreMensual \| null`; `guardar(cierre): void` | RN-25, RN-26, garantía mínima. `guardar` es todo o nada; si ya existe un cierre del mes (ext 2c), lanza `CierreYaExiste` y el caso de uso devuelve el existente. |
+| `HorasTrabajadas` | `delPeriodo(periodo: Franja): RegistroDeTurnoTrabajado[]` → `{ idAsistente, idTurno, inicioProgramado, finProgramado, entrada \| null, salida \| null, estado }` | Pasos 3 y 4. Devuelve los turnos que empiezan en el periodo, que va del lunes de la primera semana del mes al día 1 del mes siguiente (SUP-05). |
 | `DatosDeAsistentes` | `obtener(idAsistente): { carne, nombre, categoria, topes: [{ minutosPorSemana, vigenteDesde }] }` | Categoría, historial de topes y datos del archivo. |
 | `TablaTarifas` | `vigenciasEntre(desde, hasta): VigenciaDeTarifas[]` | RN-22, RN-23. El dominio elige el valor de cada fecha. |
 | `GeneradorArchivoBecas` | `generar(cierre): Archivo` | Paso 7: capa anticorrupción con el formato de Becas. |
-| `Notificador`, `Reloj` | ver 8.3 | Paso 8, `fechaDeCierre`, ext 2b. |
+| `Notificador`, `Reloj` | ver 8.3 | Paso 8, `fechaDeCierre`, ext 2b. Avisos a `COORDINACION_DE_SOPORTE`: `CIERRE_LISTO` (P8, con los carnés que tuvieron horas sobre el tope) y `TARIFA_FALTANTE` (ext 5b). |
 
 ### Contrato · `TablaTarifas`
 | Parte | Contenido |

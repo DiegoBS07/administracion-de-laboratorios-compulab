@@ -178,10 +178,10 @@ sequenceDiagram
     UC->>HT: delPeriodo(lunes de la 1.ª semana, fin de mes)
     UC->>DA: obtener(idAsistente) por cada asistente con turnos
     UC->>TT: vigenciasEntre(inicio, fin)
-    UC->>UC: TarifasDelPeriodo(vigencias) → TarifaNoDefinida (ext 5b)
+    UC->>UC: TarifasDelPeriodo(vigencias).exigirCobertura(mes) → TarifaNoDefinida (ext 5b)
     Note over UC: paso 3
     loop cada asistente con horas en el mes (ext 3a)
-        UC->>L: calcular(turnos, topes, tarifasDelPeriodo, mes)
+        UC->>L: LiquidacionDelAsistente(datos y topes).calcular(turnos, mes, tarifasDelPeriodo)
         L-->>UC: LineaDeLiquidacion · ext 3b, 3c, 4a, 4b, 5a, 5c
     end
     Note over UC: pasos 4 y 5
@@ -189,7 +189,7 @@ sequenceDiagram
     C-->>UC: c (CERRADO) · P1–P5, P7
     Note over UC: paso 6
     UC->>G: generar(c) → ErrorAlGenerarArchivo (ext 7a)
-    UC->>C: adjuntarArchivo(archivo) · P6
+    UC->>C: adjuntarArchivo(archivo) → cierre nuevo con su archivo · P6
     UC->>RC: guardar(c)
     RC-->>UC: CierreYaExiste → se devuelve el existente (ext 2c)
     Note over UC: paso 7
