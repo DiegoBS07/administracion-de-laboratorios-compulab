@@ -3,42 +3,17 @@ import { Fecha, Franja, Hora, Instante } from "../../../src/compartido/dominio/i
 import {
   type Archivo,
   type CierreMensual,
-  CierreYaExiste,
   type DatosDeAsistentes,
   type DatosDeUnAsistente,
   ErrorAlGenerarArchivo,
   type GeneradorArchivoBecas,
   type HorasTrabajadas,
-  type MesDeLiquidacion,
   type RegistroDeTurnoTrabajado,
-  type RepositorioCierres,
   type TablaTarifas,
   type VigenciaDeTarifas
 } from "../../../src/modulos/liquidacion/index.js";
 
-/**
- * Repositorio de cierres en memoria que actúa como la restricción UNIQUE (anio, mes) de la base:
- * guardar un segundo cierre del mismo mes lanza CierreYaExiste (ext 2c). Las consultas ceden el
- * turno, como una consulta real, para que dos cierres simultáneos puedan intercalarse.
- */
-export class RepositorioCierresEnMemoria implements RepositorioCierres {
-  readonly #cierres = new Map<string, CierreMensual>();
-
-  get todos(): readonly CierreMensual[] {
-    return [...this.#cierres.values()];
-  }
-
-  async porMes(mes: MesDeLiquidacion): Promise<CierreMensual | null> {
-    await Promise.resolve();
-    return this.#cierres.get(mes.clave) ?? null;
-  }
-
-  async guardar(cierre: CierreMensual): Promise<void> {
-    await Promise.resolve();
-    if (this.#cierres.has(cierre.mes.clave)) throw new CierreYaExiste(cierre.mes.clave);
-    this.#cierres.set(cierre.mes.clave, cierre);
-  }
-}
+export { RepositorioCierresEnMemoria } from "../../../src/modulos/liquidacion/infraestructura/repositorio-cierres-en-memoria.js";
 
 /** Devuelve los turnos que empiezan dentro del periodo pedido y recuerda qué periodo se pidió. */
 export class HorasTrabajadasEnMemoria implements HorasTrabajadas {

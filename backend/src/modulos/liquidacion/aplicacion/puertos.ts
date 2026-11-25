@@ -7,6 +7,8 @@ import type { VigenciaDeTarifas } from "../dominio/tarifas-del-periodo.js";
 
 export interface RepositorioCierres {
   porMes(mes: MesDeLiquidacion): Promise<CierreMensual | null>;
+  /** Cierres de ese año, en orden de mes (para la lista de GET /api/v1/cierres?anio=). */
+  delAnio(anio: number): Promise<CierreMensual[]>;
   /**
    * Todo o nada: el cierre con sus líneas, tarifas aplicadas y archivo (garantía mínima de CU-14).
    * Si ya hay un cierre de ese mes (UNIQUE (anio, mes), ext 2c) lanza CierreYaExiste.

@@ -20,6 +20,8 @@ export interface RepositorioTurnos {
   delAsistenteEntre(idAsistente: string, franja: Franja): Promise<Turno[]>;
   /** Turnos del laboratorio que tocan la franja. */
   delLaboratorioEntre(idLaboratorio: string, franja: Franja): Promise<Turno[]>;
+  /** Turnos de todos los laboratorios que tocan la franja (TurnosProgramados, 8.4). */
+  delPeriodo(franja: Franja): Promise<Turno[]>;
   /**
    * Guarda el turno en la transacción en curso. Si al confirmar salta una restricción de la base
    * (segunda barrera de ADR-0009), lanza TraslapeDeTurno o FranjaOcupadaEnLaboratorio.
@@ -48,6 +50,27 @@ export interface AsistenteParaHorario {
 
 export interface ConsultaAsistentes {
   obtener(idAsistente: string): Promise<AsistenteParaHorario | null>;
+}
+
+/** Asistente con su categoría, para elegir a quién asignar (GET /laboratorios/{id}/asistentes). */
+export interface AsistenteDelLaboratorio extends AsistenteParaHorario {
+  categoria: string;
+}
+
+export interface AsistentesDelLaboratorio {
+  /** Asistentes activos que pueden cubrir turnos en ese laboratorio. */
+  activosDe(idLaboratorio: string): Promise<AsistenteDelLaboratorio[]>;
+}
+
+export interface Laboratorio {
+  id: string;
+  nombre: string;
+  campus: string;
+}
+
+export interface CatalogoDeLaboratorios {
+  todos(): Promise<Laboratorio[]>;
+  porId(idLaboratorio: string): Promise<Laboratorio | null>;
 }
 
 export interface CalendarioAcademico {
