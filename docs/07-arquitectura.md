@@ -164,6 +164,7 @@ Se verifican con dependency-cruiser en `npm test`; si alguna falla, el build fal
 | FA-2 | Los módulos no se conocen entre sí. | Ningún archivo bajo `src/modulos/X/` importa algo de `src/modulos/Y/` (X ≠ Y). Solo `src/arranque/` puede conectar módulos. | QA-6, ADR-0001 |
 | FA-3 | La aplicación no depende de la infraestructura. | Ningún archivo bajo `*/aplicacion/` importa `*/infraestructura/`. | QA-6 |
 | FA-4 | No hay ciclos. | No existen dependencias circulares en `src/`. | Mantenibilidad |
+| FA-5 | La aplicación no importa paquetes. | Ningún archivo bajo `*/aplicacion/` importa paquetes de `node_modules` (`pg`, Kysely, Fastify…): la tecnología queda en `infraestructura/`. | QA-6, R-5 |
 
 El núcleo ejecutable implementa al menos FA-1 y FA-2 (R-9).
 
@@ -296,3 +297,43 @@ Leyenda: recuadro exterior = servidor físico; recuadro interior = red de Docker
 | El esquema de la base | Nueva migración `V{n}__descripcion.sql` en `database/migrations/`; **nunca** se edita una migración ya aplicada | El dominio | Pruebas del repositorio afectado |
 | Se necesita un aviso nuevo | Llamada a `Notificador` en el caso de uso y plantilla en `notificaciones/` | Otros casos de uso | Prueba de la poscondición del aviso |
 | Una decisión difícil de revertir | Nuevo ADR en `docs/adr/`; si reemplaza a otro, se marca el anterior como sustituido (no se borra) | ADR anteriores | — |
+
+
+## 7.11 Modelo de datos (PostgreSQL 14)
+
+El esquema vive solo en `database/migrations/` (Flyway, V1 a V6) y los tipos de Kysely en `backend/src/compartido/infraestructura/postgres/esquema.ts` lo reflejan.
+
+```mermaid
+---
+title: CompuLab · Modelo de datos del núcleo ejecutable · 2026-11-24
+---
+erDiagram
+    laboratorios ||--o{ maquinas : tiene
+    laboratorios ||--o{ turnos : "abre con"
+    asistentes ||--o{ turnos : cubre
+    asistentes ||--o{ topes_asistentes : "historial de topes"
+    asistentes ||--o{ disponibilidad_asistentes : declara
+    asistentes }o--o{ laboratorios : "asistentes_laboratorios"
+    turnos ||--o| marcas : registra
+    maquinas ||--o{ reservas : "se reserva en"
+    vigencias_tarifas ||--o{ tarifas_por_categoria : fija
+    cierres ||--o{ tarifas_aplicadas : copia
+    cierres ||--o{ lineas_liquidacion : contiene
+    lineas_liquidacion ||--o{ horas_no_pagadas : detalla
+```
+
+Leyenda: rectángulo = tabla; `||` = exactamente uno; `o{` = cero o muchos; `o|` = cero o uno. Sin dibujar: `semestres`, `roles_usuarios`, `sesiones` y `avisos`, que no se relacionan por llave con las demás.
+
+| Restricción | Tabla | Regla | Error de dominio |
+| --- | --- | --- | --- |
+| `turnos_sin_traslape_asistente` | turnos | `EXCLUDE (id_asistente =, franja &&)` salvo `VACANTE` y `DESCARTADO` | `TraslapeDeTurno` |
+| `turnos_sin_traslape_laboratorio` | turnos | `EXCLUDE (id_laboratorio =, franja &&)` con el mismo filtro | `FranjaOcupadaEnLaboratorio` |
+| `reservas_sin_traslape_maquina` | reservas | `EXCLUDE (id_maquina =, franja &&)` sobre `ACTIVA` y `EN_USO` | `MaquinaNoDisponible` |
+| `reservas_una_activa_por_estudiante` | reservas | índice único parcial sobre `ACTIVA` y `EN_USO` | `YaTieneReservaActiva` |
+| `*_clave_de_solicitud_unica` | turnos, reservas | `UNIQUE (usuario, clave_solicitud)` (ADR-0010) | `ClaveDeSolicitudReutilizada` |
+| `cierres_un_cierre_por_mes` | cierres | llave primaria `(anio, mes)` | `CierreYaExiste` → se devuelve el existente |
+| `vigencias_tarifas_sin_traslape` | vigencias_tarifas | `EXCLUDE (daterange &&)` | — (lo impide el registro de tarifas) |
+
+**Dos modos de persistencia** (variable `APP_PERSISTENCIA`): `postgres` en el contenedor y `memoria` para las pruebas y para correr sin base. Con `APP_DATOS_DEMO=true`, una base vacía se llena al arrancar con los mismos datos de demostración del modo en memoria (con un candado para que dos instancias no siembren a la vez). La franja se guarda como `inicio` y `fin` (`timestamptz`) más una columna generada `tstzrange` para las restricciones.
+
+**Pruebas con la base real:** `tests/postgres/` corre solo si existe `APP_DB_PRUEBAS`. Cada archivo crea su propio esquema, le aplica las migraciones y lo borra al terminar. Ahí se comprueban `FOR UPDATE`, las restricciones y las transacciones, y la API completa corre también sobre PostgreSQL.

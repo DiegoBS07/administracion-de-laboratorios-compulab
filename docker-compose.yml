@@ -55,6 +55,8 @@ services:
       NODE_ENV: production
       TZ: America/Costa_Rica
       APP_PORT: ${APP_PORT}
+      APP_PERSISTENCIA: postgres
+      APP_DATOS_DEMO: ${APP_DATOS_DEMO:-true}
       APP_HORA_SIMULADA: ${APP_HORA_SIMULADA:-}
       APP_COOKIE_SEGURA: ${APP_COOKIE_SEGURA:-false}
       APP_DB_HOST: db

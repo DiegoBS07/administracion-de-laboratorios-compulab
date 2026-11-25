@@ -12,3 +12,4 @@ export {
   type UsuarioDeDemostracion
 } from "./infraestructura/en-memoria.js";
 export { instalarGanchoDeSesion, NOMBRE_COOKIE, registrarRutasDeSesion, tokenDeLaSolicitud } from "./infraestructura/rutas-http.js";
+export { RepositorioRolesPostgres, RepositorioSesionesPostgres } from "./infraestructura/repositorios-postgres.js";

@@ -144,6 +144,22 @@ describe("funciones de aptitud", () => {
     });
   });
 
+  describe("FA-5 · la aplicación no importa paquetes", () => {
+    it("detecta un caso de uso que importa un paquete de node_modules", async () => {
+      const carpeta = await armarProyecto({
+        "src/modulos/horarios/aplicacion/consultar-horario.ts": 'import { describe } from "vitest";\nexport const consultar = describe;\n'
+      });
+      expect(reglas(await violacionesEn(carpeta))).toContain("FA-5-aplicacion-sin-paquetes");
+    });
+
+    it("permite que la infraestructura use paquetes", async () => {
+      const carpeta = await armarProyecto({
+        "src/modulos/horarios/infraestructura/repositorio-sql.ts": 'import { describe } from "vitest";\nexport const repo = describe;\n'
+      });
+      expect(reglas(await violacionesEn(carpeta))).not.toContain("FA-5-aplicacion-sin-paquetes");
+    });
+  });
+
   describe("FA-4 · no hay ciclos", () => {
     it("detecta dos archivos que se importan mutuamente", async () => {
       const carpeta = await armarProyecto({

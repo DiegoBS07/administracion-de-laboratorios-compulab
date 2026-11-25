@@ -34,7 +34,7 @@ La Escuela no eligió lenguaje ni framework. La elección y sus alternativas est
 | Migraciones | Flyway Community 11 (`database/migrations`) | Apache 2.0 | R-4 |
 | Backend | Node.js 24 LTS + TypeScript 6 | MIT / Apache 2.0 | R-4, R-5 a R-7 |
 | Servidor HTTP del backend | Fastify 5 (versión fijada 5.12.8, con su bitácora pino) | MIT | R-4 |
-| Acceso a datos | `pg` + Kysely (SQL tipado, sin migraciones propias) | MIT | R-4 |
+| Acceso a datos | `pg` 8.23 + Kysely 0.28 (SQL tipado, sin migraciones propias: el esquema lo aplica Flyway) | MIT | R-4 |
 | Tareas programadas | node-cron, dentro del backend | ISC | R-4 (ADR-0003) |
 | Correo | Nodemailer sobre el SMTP institucional | MIT-0 | R-3, R-4 |
 | Bitácora (logs estructurados) | pino | MIT | R-4 |

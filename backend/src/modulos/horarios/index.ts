@@ -50,3 +50,4 @@ export type {
 export { LaboratorioNoExiste } from "./aplicacion/errores.js";
 export { RepositorioTurnosEnMemoria } from "./infraestructura/repositorio-turnos-en-memoria.js";
 export { type CasosDeHorarios, registrarRutasDeHorarios } from "./infraestructura/rutas-http.js";
+export { RepositorioTurnosPostgres } from "./infraestructura/repositorio-turnos-postgres.js";

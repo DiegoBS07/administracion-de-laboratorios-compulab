@@ -67,8 +67,8 @@ Si no se puede nombrar la implementación que sustituiría a una pieza sin tocar
 | Pieza | Implementación actual | Se puede reemplazar por… | Quién no se entera |
 | --- | --- | --- | --- |
 | Módulo `horarios` (vía `CoberturaDeLaboratorio`) | Turnos asignados en CompuLab | Un calendario de apertura publicado por la Escuela | `reservas` |
-| `RepositorioTurnos`, `RepositorioReservas`, `RepositorioCierres` | PostgreSQL con Kysely (sección 7) | Repositorios en memoria: los usan las pruebas y el núcleo ejecutable mientras no hay base de datos | Casos de uso y dominio |
-| `TablaTarifas` | Tabla de vigencias en PostgreSQL | Tarifas fijas (pruebas) o un catálogo publicado por la Coordinación | `CerrarMes` |
+| `RepositorioTurnos`, `RepositorioReservas`, `RepositorioCierres` | PostgreSQL con Kysely (`*Postgres` en la carpeta `infraestructura/` de cada módulo) | Repositorios en memoria (pruebas y `APP_PERSISTENCIA=memoria`) | Casos de uso y dominio |
+| `TablaTarifas` | Tabla de vigencias en PostgreSQL (`TablaTarifasPostgres`) | Tarifas fijas (pruebas) o un catálogo publicado por la Coordinación | `CerrarMes` |
 | `GeneradorArchivoBecas` | CSV (SUP-03) | XLSX o el formato nuevo que defina Becas | Dominio de liquidación |
 | `DirectorioInstitucional` | Adaptador LDAP | Adaptador OIDC, o un doble con usuarios fijos | Todo lo que usa `Autorizacion` |
 | `Notificador` | Aviso en la app + correo SMTP | Solo aviso en la app, o un doble que guarda avisos en memoria | Los casos de uso |
@@ -112,7 +112,7 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 | Sintaxis | `ejecutar<T>(trabajo: () => Promise<T>): Promise<T>` |
 | Semántica | **Pre:** ninguna. **Post:** todo lo que `trabajo` escribió por los repositorios queda confirmado junto, o nada queda si lanzó un error. Los bloqueos tomados dentro se liberan al terminar. |
 | Errores | Relanza el error de `trabajo`. Si una restricción de la base salta al confirmar, el repositorio que escribió ya la tradujo a su error de dominio (ADR-0009). |
-| Calidad de servicio | Una transacción de PostgreSQL; en pruebas, un doble que ejecuta `trabajo` directamente. |
+| Calidad de servicio | Una transacción de PostgreSQL (`UnidadDeTrabajoPostgres`); una llamada anidada se une a la transacción en curso. Cada escritura que puede chocar con una restricción usa un `SAVEPOINT`, así el repositorio puede consultar el registro en conflicto antes de lanzar el error de dominio. En pruebas, `UnidadDeTrabajoEnMemoria`. |
 | Versión | v1. |
 
 ### `DirectorioInstitucional` (diseño; fuera del núcleo)

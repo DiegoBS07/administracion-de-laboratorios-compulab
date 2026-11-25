@@ -49,31 +49,47 @@ export class AutorizacionPorRoles implements horarios.Autorizacion {
 /** Estados de turno que no generan horas para liquidar. */
 const SIN_HORAS = new Set(["VACANTE", "DESCARTADO", "PENDIENTE_ACEPTACION"]);
 
-/**
- * liquidacion.HorasTrabajadas ← horarios.TurnosProgramados + marcas. El módulo asistencia queda
- * fuera del núcleo, así que las marcas vienen de los datos de demostración.
- */
-export class HorasTrabajadasDeDemostracion implements liquidacion.HorasTrabajadas {
-  readonly #turnos: horarios.ConsultarTurnosProgramados;
+/** Marcas de entrada y salida por turno (las guarda el módulo asistencia, fuera del núcleo). */
+export interface LectorDeMarcas {
+  de(idsTurnos: readonly string[]): Promise<ReadonlyMap<string, Marcas>>;
+}
+
+export class MarcasEnMemoria implements LectorDeMarcas {
   readonly #marcas: ReadonlyMap<string, Marcas>;
 
-  constructor(turnos: horarios.ConsultarTurnosProgramados, marcas: ReadonlyMap<string, Marcas>) {
+  constructor(marcas: ReadonlyMap<string, Marcas>) {
+    this.#marcas = marcas;
+  }
+
+  async de(idsTurnos: readonly string[]): Promise<ReadonlyMap<string, Marcas>> {
+    return new Map(idsTurnos.flatMap((id) => (this.#marcas.has(id) ? [[id, this.#marcas.get(id) as Marcas] as const] : [])));
+  }
+}
+
+/** liquidacion.HorasTrabajadas ← horarios.TurnosProgramados + las marcas de cada turno. */
+export class HorasTrabajadasDesdeHorarios implements liquidacion.HorasTrabajadas {
+  readonly #turnos: horarios.ConsultarTurnosProgramados;
+  readonly #marcas: LectorDeMarcas;
+
+  constructor(turnos: horarios.ConsultarTurnosProgramados, marcas: LectorDeMarcas) {
     this.#turnos = turnos;
     this.#marcas = marcas;
   }
 
   async delPeriodo(periodo: Franja): Promise<liquidacion.RegistroDeTurnoTrabajado[]> {
-    return (await this.#turnos.delPeriodo(periodo))
-      .filter((t): t is horarios.TurnoProgramadoDTO & { idAsistente: string } => t.idAsistente !== null && !SIN_HORAS.has(t.estado))
-      .map((t) => ({
-        idTurno: t.id,
-        idAsistente: t.idAsistente,
-        inicioProgramado: t.inicio,
-        finProgramado: t.fin,
-        entrada: this.#marcas.get(t.id)?.entrada ?? null,
-        salida: this.#marcas.get(t.id)?.salida ?? null,
-        estado: t.estado
-      }));
+    const turnos = (await this.#turnos.delPeriodo(periodo)).filter(
+      (t): t is horarios.TurnoProgramadoDTO & { idAsistente: string } => t.idAsistente !== null && !SIN_HORAS.has(t.estado)
+    );
+    const marcas = await this.#marcas.de(turnos.map((t) => t.id));
+    return turnos.map((t) => ({
+      idTurno: t.id,
+      idAsistente: t.idAsistente,
+      inicioProgramado: t.inicio,
+      finProgramado: t.fin,
+      entrada: marcas.get(t.id)?.entrada ?? null,
+      salida: marcas.get(t.id)?.salida ?? null,
+      estado: t.estado
+    }));
   }
 }
 

@@ -38,3 +38,4 @@ export { POLITICA_DE_RESERVAS } from "./dominio/politica-de-reservas.js";
 export { RepositorioMaquinasEnMemoria } from "./infraestructura/repositorio-maquinas-en-memoria.js";
 export { RepositorioReservasEnMemoria } from "./infraestructura/repositorio-reservas-en-memoria.js";
 export { type CasosDeReservas, registrarRutasDeReservas } from "./infraestructura/rutas-http.js";
+export { RepositorioMaquinasPostgres, RepositorioReservasPostgres } from "./infraestructura/repositorios-postgres.js";

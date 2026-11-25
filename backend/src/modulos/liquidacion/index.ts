@@ -25,3 +25,4 @@ export type { TopeVigente } from "./dominio/liquidacion-del-asistente.js";
 export { GeneradorArchivoBecasCsv, ENCABEZADO_BECAS } from "./infraestructura/generador-archivo-becas-csv.js";
 export { RepositorioCierresEnMemoria } from "./infraestructura/repositorio-cierres-en-memoria.js";
 export { type CasosDeLiquidacion, registrarRutasDeLiquidacion } from "./infraestructura/rutas-http.js";
+export { RepositorioCierresPostgres, TablaTarifasPostgres } from "./infraestructura/repositorios-postgres.js";

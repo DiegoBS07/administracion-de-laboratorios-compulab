@@ -12,8 +12,8 @@ Cada caso de uso que cambia estado corre en **una transacción**, y cada regla s
 
 | Regla | Mecanismo |
 | --- | --- |
-| RN-06 traslape por asistente y RN-07 tope semanal | La transacción de asignar **bloquea la agenda del asistente** (`SELECT … FOR UPDATE` sobre su fila) antes de leer sus turnos: las asignaciones al mismo asistente se ejecutan de una en una y la segunda ve a la primera. Segunda barrera para RN-06: `EXCLUDE USING gist (id_asistente WITH =, franja WITH &&)` sobre turnos asignados, pendientes o en curso. |
-| RN-09 un turno por franja del laboratorio | `EXCLUDE USING gist (id_laboratorio WITH =, franja WITH &&)` con el mismo filtro de estados. Si salta al confirmar, se traduce a `FranjaOcupadaEnLaboratorio`. |
+| RN-06 traslape por asistente y RN-07 tope semanal | La transacción de asignar **bloquea la agenda del asistente** (`SELECT … FOR UPDATE` sobre su fila) antes de leer sus turnos: las asignaciones al mismo asistente se ejecutan de una en una y la segunda ve a la primera. Segunda barrera para RN-06: `EXCLUDE USING gist (id_asistente WITH =, franja WITH &&)` sobre los turnos en todos sus estados salvo `VACANTE` y `DESCARTADO` (los mismos que cuentan para el tope, 10.5). |
+| RN-09 un turno por franja del laboratorio | `EXCLUDE USING gist (id_laboratorio WITH =, franja WITH &&)` con el mismo filtro de estados. Si salta al guardar, se traduce a `FranjaOcupadaEnLaboratorio`. |
 | Doble reserva de una máquina | `EXCLUDE USING gist (id_maquina WITH =, franja WITH &&)` sobre reservas activas o en uso. Se traduce a `MaquinaNoDisponible`. |
 | RN-17 una reserva activa por estudiante | Índice único parcial `(id_estudiante) WHERE estado IN ('ACTIVA','EN_USO')`. Como solo puede existir una reserva activa a la vez, dos reservas simultáneas no pueden sumar más de 6 h. Se traduce a `YaTieneReservaActiva`. |
 | RN-26 un cierre por mes | `UNIQUE (anio, mes)`. Si dos disparos coinciden, el que pierde devuelve el cierre existente. |

@@ -48,7 +48,7 @@ Además, según el enunciado:
 | Funciones de aptitud | Al menos dos que fallen el build, cada una con su prueba que planta una violación. | FA-1 y FA-2 en `07-arquitectura.md`. |
 | README | Instalar y correr pruebas en ≤ 10 líneas. | `README.md` de la raíz. |
 
-Fuera del núcleo ejecutable (se diseña, no se programa): todo lo demás de 3.1, incluidos el Directorio real, el correo real, el reloj programado y la persistencia en PostgreSQL. En el núcleo se sustituyen por dobles detrás de los mismos puertos.
+Fuera del núcleo ejecutable (se diseña, no se programa): todo lo demás de 3.1, incluidos el Directorio real, el correo real y el reloj programado. En el núcleo se sustituyen por dobles detrás de los mismos puertos. La persistencia en PostgreSQL sí se implementó (sección 7 de la implementación, `07-arquitectura.md` 7.11), aunque las pruebas exigidas por el curso siguen corriendo sin base de datos.
 
 ## 3.4 Pantallas mínimas del núcleo ejecutable
 

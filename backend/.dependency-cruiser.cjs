@@ -50,6 +50,14 @@ module.exports = {
       to: { path: "^src/modulos/[^/]+/infraestructura/" }
     },
     {
+      name: "FA-5-aplicacion-sin-paquetes",
+      comment:
+        "FA-5 · Los casos de uso no importan paquetes de node_modules (pg, Kysely, Fastify…): la tecnología queda en infraestructura/.",
+      severity: "error",
+      from: { path: "^src/modulos/[^/]+/aplicacion/" },
+      to: { dependencyTypes: PAQUETES }
+    },
+    {
       name: "FA-4-sin-ciclos",
       comment: "FA-4 · No hay dependencias circulares en src/.",
       severity: "error",
