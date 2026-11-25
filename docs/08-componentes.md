@@ -101,7 +101,7 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 | Parte | Contenido |
 | --- | --- |
 | Sintaxis | `puedeModificarHorario(usuario: UsuarioActual, idLaboratorio: string): Promise<boolean>` |
-| Semántica | **Pre:** `usuario` viene de una sesión válida. **Post:** verdadero si el usuario es coordinador de ese laboratorio o coordinador de soporte. Si devuelve falso, el caso de uso registra el intento en la bitácora de seguridad (QA-7). |
+| Semántica | **Pre:** `usuario` viene de una sesión válida. **Post:** verdadero si el usuario es coordinador de ese laboratorio o coordinador de soporte. Si devuelve falso, la propia implementación registra el intento en la bitácora de seguridad (QA-7); así el caso de uso no necesita otra dependencia. |
 | Errores | Ninguno: un laboratorio inexistente devuelve falso. |
 | Calidad de servicio | ≤ 10 ms; sin efectos. |
 | Versión | v1. |
@@ -129,7 +129,7 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 ### Interfaz provista
 | Operación | Semántica | Errores |
 | --- | --- | --- |
-| `AsignarTurno.ejecutar(usuario, SolicitudAsignarTurno): TurnoAsignadoDTO` | CU-06 (contrato completo en `04-casos-de-uso.md`). Crea un turno asignado o pendiente de aceptación; con una clave ya usada devuelve el turno existente. | `SinPermisoSobreLaboratorio`, `FranjaDeTurnoInvalida`, `FueraDelSemestre`, `TurnoEnElPasado`, `AsistenteNoExiste`, `AsistenteNoActivo`, `TraslapeDeTurno`, `FranjaOcupadaEnLaboratorio`, `TopeSemanalExcedido`, `ClaveDeSolicitudReutilizada` |
+| `AsignarTurno.ejecutar(usuario, SolicitudAsignarTurno): { creado, turno: TurnoAsignadoDTO }` | CU-06 (contrato completo en `04-casos-de-uso.md`). Crea un turno asignado o pendiente de aceptación; con una clave ya usada devuelve el turno existente con `creado: false` (la API responde 200 en lugar de 201). **Implementado** en `backend/src/modulos/horarios/`. | `SinPermisoSobreLaboratorio`, `FranjaDeTurnoInvalida`, `FueraDelSemestre`, `TurnoEnElPasado`, `AsistenteNoExiste`, `AsistenteNoActivo`, `TraslapeDeTurno`, `FranjaOcupadaEnLaboratorio`, `TopeSemanalExcedido`, `ClaveDeSolicitudReutilizada` |
 | `ConsultarHorario.ejecutar(idLaboratorio, semana): HorarioSemanalDTO` | RF-11. Turnos del laboratorio en la semana. | `LaboratorioNoExiste` |
 | `CoberturaDeLaboratorio.franjasAbiertas(idLaboratorio, desde, hasta): Franja[]` | Ver contrato abajo. | `LaboratorioNoExiste` |
 | `TurnosProgramados.delPeriodo(desde, hasta): TurnoProgramadoDTO[]` | Turnos con responsable, franja y estado en el periodo (lo usa asistencia). | — |
@@ -146,10 +146,11 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 ### Interfaces requeridas
 | Puerto | Operaciones | Para qué |
 | --- | --- | --- |
-| `RepositorioTurnos` | `porClaveDeSolicitud(idUsuario, clave): Turno \| null`; `bloquearAgendaDe(idAsistente): void`; `delAsistenteEntre(idAsistente, desde, hasta): Turno[]`; `delLaboratorioEntre(idLaboratorio, desde, hasta): Turno[]`; `guardar(turno): void` | Ext 5b (ADR-0010); serializar asignaciones al mismo asistente (ADR-0009); validar RN-06, RN-07, RN-09; registrar. `guardar` lanza `TraslapeDeTurno` o `FranjaOcupadaEnLaboratorio` si una restricción de la base salta. |
+| `RepositorioTurnos` | `porClaveDeSolicitud(idUsuario, clave): Turno \| null`; `bloquearAgendaDe(idAsistente): void`; `delAsistenteEntre(idAsistente, franja): Turno[]`; `delLaboratorioEntre(idLaboratorio, franja): Turno[]`; `guardar(turno): void` | Ext 5b (ADR-0010); serializar asignaciones al mismo asistente (ADR-0009); validar RN-06, RN-07, RN-09; registrar. `guardar` lanza `TraslapeDeTurno` o `FranjaOcupadaEnLaboratorio` si una restricción de la base salta. |
 | `UnidadDeTrabajo` | ver 8.3 | Todo o nada. |
 | `ConsultaAsistentes` | `obtener(idAsistente): AsistenteParaHorario \| null` → `{ id, nombre, activo, topeSemanalMinutos, disponibilidad: Bloque[] }` | Validar RN-04, RN-07, RN-08. |
 | `CalendarioAcademico` | `semestreVigente(): { inicio: Fecha, fin: Fecha } \| null` | Validar que la fecha esté dentro del semestre. |
+| `GeneradorDeIds` | `nuevo(): string` | Identificador del turno nuevo, sin que el dominio genere números aleatorios (R-6). |
 | `Autorizacion`, `Notificador`, `Reloj` | ver 8.3 | Ext 2a, ext 4d, ext 3c. |
 
 ## 8.5 Módulo reservas

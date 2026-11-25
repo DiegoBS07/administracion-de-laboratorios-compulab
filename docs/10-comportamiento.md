@@ -237,7 +237,7 @@ stateDiagram-v2
     CUBIERTO --> [*]
 ```
 
-Leyenda: rectángulo = estado; flecha = transición con el evento que la dispara. Cuentan para traslape y tope (RN-06, RN-07, RN-09): `PENDIENTE_ACEPTACION`, `ASIGNADO`, `EN_CURSO`. Abren el laboratorio para reservas (RN-15): `ASIGNADO` y `EN_CURSO`. Un cambio de responsable aprobado (CU-09) no cambia el estado, solo el asistente.
+Leyenda: rectángulo = estado; flecha = transición con el evento que la dispara. Cuentan para traslape y tope (RN-06, RN-07, RN-09) todos los estados salvo `VACANTE` y `DESCARTADO`; por eso un turno ya `CUBIERTO` el lunes sigue sumando al tope de esa semana. Abren el laboratorio para reservas (RN-15): `ASIGNADO` y `EN_CURSO`. Un cambio de responsable aprobado (CU-09) no cambia el estado, solo el asistente.
 
 ### Reserva
 
