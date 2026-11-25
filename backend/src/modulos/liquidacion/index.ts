@@ -1,7 +1,7 @@
 // Interfaz provista del módulo liquidacion (docs/08-componentes.md, 8.6).
 // Es lo único que src/arranque/ usa de este módulo; los demás módulos nunca lo importan (FA-2).
 export { CerrarMes, type DependenciasCerrarMes, type ResultadoCerrarMes } from "./aplicacion/cerrar-mes.js";
-export { ConsultarCierre, ObtenerArchivoBecas } from "./aplicacion/consultar-cierre.js";
+export { ConsultarCierre, ListarCierresDelAnio, type MesDelAnioDTO, ObtenerArchivoBecas } from "./aplicacion/consultar-cierre.js";
 export type { ArchivoDTO, ResumenDeCierreDTO } from "./aplicacion/resumen-de-cierre.js";
 export {
   COORDINACION_DE_SOPORTE,
@@ -23,3 +23,5 @@ export { MesDeLiquidacion } from "./dominio/mes-de-liquidacion.js";
 export type { VigenciaDeTarifas } from "./dominio/tarifas-del-periodo.js";
 export type { TopeVigente } from "./dominio/liquidacion-del-asistente.js";
 export { GeneradorArchivoBecasCsv, ENCABEZADO_BECAS } from "./infraestructura/generador-archivo-becas-csv.js";
+export { RepositorioCierresEnMemoria } from "./infraestructura/repositorio-cierres-en-memoria.js";
+export { type CasosDeLiquidacion, registrarRutasDeLiquidacion } from "./infraestructura/rutas-http.js";

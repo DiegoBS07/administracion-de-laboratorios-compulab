@@ -35,3 +35,6 @@ export { Maquina } from "./dominio/maquina.js";
 export { Reserva } from "./dominio/reserva.js";
 export type { EstadoReserva } from "./dominio/estado-reserva.js";
 export { POLITICA_DE_RESERVAS } from "./dominio/politica-de-reservas.js";
+export { RepositorioMaquinasEnMemoria } from "./infraestructura/repositorio-maquinas-en-memoria.js";
+export { RepositorioReservasEnMemoria } from "./infraestructura/repositorio-reservas-en-memoria.js";
+export { type CasosDeReservas, registrarRutasDeReservas } from "./infraestructura/rutas-http.js";
