@@ -1,0 +1,35 @@
+{
+  "name": "compulab-frontend",
+  "version": "0.1.0",
+  "description": "Frontend de CompuLab: React + TypeScript, compilado con Vite y servido por Nginx (docs/07-arquitectura.md).",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "aptitud": "depcruise src --config .dependency-cruiser.cjs",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run aptitud && vitest run",
+    "build": "npm run aptitud && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "verificar": "npm run typecheck && npm test"
+  },
+  "dependencies": {
+    "@fontsource/roboto": "5.3.0",
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
+    "react-router": "8.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@vitejs/plugin-react": "6.2.1",
+    "dependency-cruiser": "18.9.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.6",
+    "vitest": "5.1.1"
+  }
+}
