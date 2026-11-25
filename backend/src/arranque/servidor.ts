@@ -45,6 +45,9 @@ export function crearServidor(opciones: OpcionesServidor = {}): FastifyInstance 
   const turnosProgramados = new horarios.ConsultarTurnosProgramados({ turnos: a.turnos });
   const coberturaParaReservas = new CoberturaParaReservas(cobertura);
 
+  // Hora oficial (8.3): la interfaz la usa como "hoy"; la del dispositivo nunca se usa.
+  app.get("/api/v1/hora", async () => ({ ahora: reloj.ahora().aISO() }));
+
   app.get("/health", async (_solicitud, respuesta) => {
     if (!(await a.comprobarSalud())) return respuesta.status(503).send({ estado: "sin-persistencia" });
     return { estado: "ok" };
@@ -78,6 +81,7 @@ export function crearServidor(opciones: OpcionesServidor = {}): FastifyInstance 
 
   reservas.registrarRutasDeReservas(app, {
     consultarDisponibilidad: new reservas.ConsultarDisponibilidad({ maquinas: a.maquinas, reservas: a.reservas, cobertura: coberturaParaReservas }),
+    consultarMisReservas: new reservas.ConsultarMisReservas({ maquinas: a.maquinas, reservas: a.reservas, reloj }),
     reservarMaquina: new reservas.ReservarMaquina({
       maquinas: a.maquinas,
       reservas: a.reservas,

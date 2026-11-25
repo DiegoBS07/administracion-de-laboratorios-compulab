@@ -164,6 +164,7 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 | --- | --- | --- |
 | `ReservarMaquina.ejecutar(usuario, SolicitudReserva): { creada, reserva: ReservaDTO }` | CU-11 (contrato completo en `04-casos-de-uso.md`). Crea una reserva activa; con una clave ya usada devuelve la reserva existente con `creada: false`. **Implementado** en `backend/src/modulos/reservas/`. | `FranjaDeReservaInvalida`, `FueraDeHorizonteDeReserva`, `ReservaExcedeDuracion`, `LaboratorioCerradoEnFranja`, `MaquinaFueraDeServicio`, `MaquinaNoDisponible`, `YaTieneReservaActiva`, `LimiteSemanalDeReservaExcedido`, `MaquinaNoExiste`, `ClaveDeSolicitudReutilizada` |
 | `ConsultarDisponibilidad.ejecutar(idLaboratorio, fecha): DisponibilidadDTO` | RF-22. Franjas abiertas y estado de cada máquina con sus reservas activas del día; un día sin franjas devuelve la lista vacía (CU-11 ext 2a). **Implementado.** | `LaboratorioNoExiste` |
+| `ConsultarMisReservas.ejecutar(usuario): MisReservasDTO` | Apoyo a CU-11 (no es un RF propio). Reserva activa del estudiante y minutos que lleva en la semana, para que la pantalla prevenga las ext 6a y 6b de CU-11 (`diseno-ux-ui.md` 15.6). **Implementado.** | — |
 | `UsoDeMaquinas.delPeriodo(idLaboratorio, desde, hasta)` | Horas reservadas con presentación y periodos fuera de servicio por máquina (lo usa reportes). | `LaboratorioNoExiste` |
 
 ### Interfaces requeridas
@@ -253,7 +254,8 @@ Es la interfaz provista del contenedor `backend` y el acuerdo que permite trabaj
 | `POST /api/v1/sesion` | Iniciar sesión. Cuerpo: `{ usuario, secreto }`. Deja la cookie `compulab_sesion` (`HttpOnly`, `SameSite=Lax`, 8 h). En el núcleo ejecutable autentica contra un Directorio de demostración; el selector de 15.7 envía el usuario elegido con la contraseña `demo`. | `201 { id, nombre, roles: [{ rol: "ESTUDIANTE" \| "ASISTENTE" \| "COORDINADOR_LABORATORIO" \| "COORDINADOR_SOPORTE", idLaboratorio? }] }` · `401 CREDENCIALES_INVALIDAS` · `503 DIRECTORIO_NO_DISPONIBLE` |
 | `GET /api/v1/sesion` | Usuario actual y sus roles, para decidir la pantalla de inicio y el menú. | `200` mismo cuerpo · `401 NO_AUTENTICADO` |
 | `DELETE /api/v1/sesion` | Cerrar sesión. | `204` |
-| `GET /api/v1/sesion/usuarios-de-demostracion` | Solo en el núcleo ejecutable: usuarios para el selector de 15.7. | `200 [{ usuario, nombre }]` |
+| `GET /api/v1/sesion/usuarios-de-demostracion` | Solo en el núcleo ejecutable: usuarios para el selector de 15.7. | `200 [{ usuario, nombre, descripcion }]` |
+| `GET /api/v1/hora` | Hora oficial del servidor (8.3), sin sesión. La interfaz la usa como "hoy"; la hora del dispositivo nunca se usa. | `200 { ahora }` |
 
 ### CU-06 · Horario y asignación de turnos
 | Método y ruta | Uso | Respuesta |
@@ -267,6 +269,7 @@ Es la interfaz provista del contenedor `backend` y el acuerdo que permite trabaj
 | Método y ruta | Uso | Respuesta |
 | --- | --- | --- |
 | `GET /api/v1/laboratorios/{idLaboratorio}/disponibilidad?fecha=AAAA-MM-DD` | Franjas abiertas y máquinas (`consultarDisponibilidad`). | `200 { franjasAbiertas: [{ inicio, fin }], maquinas: [{ id, codigo, estado: "EN_SERVICIO" \| "FUERA_DE_SERVICIO", reservas: [{ inicio, fin }] }] }` |
+| `GET /api/v1/reservas/mias` | Reserva activa y cupo de la semana del estudiante (`ConsultarMisReservas`). Solo rol estudiante. | `200 { semana, minutosReservadosSemana, limiteSemanalMinutos, activa: { id, idMaquina, codigoMaquina, idLaboratorio, inicio, fin, estado, limitePresentacion } \| null, deLaSemana: [...] }` · `403 SIN_PERMISO` |
 | `POST /api/v1/reservas` | Reservar (`reservarMaquina`). Cabecera `Idempotency-Key`. Cuerpo: `{ idMaquina, inicio, fin }` | `201` (o `200` si es reenvío) `{ id, idMaquina, inicio, fin, estado: "ACTIVA", limitePresentacion }` |
 | `GET /api/v1/reservas/mias` | Reservas del estudiante en la semana actual (para mostrar la activa y las horas usadas). | `200 { minutosReservadosSemana, reservas: [{ id, idMaquina, inicio, fin, estado }] }` |
 

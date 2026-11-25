@@ -111,20 +111,27 @@ Cada módulo responde ante un solo actor: por eso las métricas para el presupue
 ### Frontend
 
 ```
-frontend/src/
-├── funcionalidades/
-│   ├── horario-laboratorio/      CU-06: vista, presentador, modelo de vista
-│   ├── reservar-maquina/         CU-11
-│   └── cierre-mensual/           CU-14
-├── compartido/
-│   ├── api/                      cliente HTTP, tipos del contrato de la API (08-componentes.md), clave de solicitud
-│   └── ui/                       componentes visuales reutilizables
-└── app/                          rutas, sesión y selección de rol
+frontend/
+├── src/
+│   ├── funcionalidades/
+│   │   ├── horario-laboratorio/  CU-06: presentador.ts (modelo de vista, con pruebas) y pantallas.tsx
+│   │   ├── reservar-maquina/     CU-11 y Mis reservas
+│   │   └── cierre-mensual/       CU-14
+│   ├── compartido/
+│   │   ├── api/                  cliente HTTP (errores de 8.7, reintento con la misma Idempotency-Key), tipos del contrato
+│   │   └── ui/                   estilos del TEC (portados del prototipo), componentes y formato de fechas y colones
+│   └── app/                      rutas, sesión, hora oficial, navegación por rol y esqueleto
+├── nginx/                        configuración: sirve el build, reenvía /api al backend, cabeceras de seguridad
+└── Dockerfile                    compila con Vite y sirve con nginx:1.28-alpine
 ```
 
 Las rutas, el menú de cada rol y los flujos de pantalla están definidos en `diseno-ux-ui.md`.
 
 Patrón *Humble Object*: el **presentador** convierte la respuesta de la API en un modelo de vista (fechas legibles, colones formateados, mensajes de error en lenguaje sencillo) y se prueba sin renderizar; la **vista** (componente React) solo muestra el modelo de vista.
+
+Funciones de aptitud del frontend (`frontend/.dependency-cruiser.cjs`, en `npm test` y `npm run build`): **FF-1** un `presentador.ts` no importa React ni componentes `.tsx`; **FF-2** una funcionalidad no importa a otra; **FF-3** `compartido/` no depende de `funcionalidades/` ni de `app/`; **FF-4** sin ciclos.
+
+Todas las fechas y horas salen del texto ISO con desfase `-06:00` que envía la API; nunca se convierten a la zona del dispositivo. "Hoy" es la hora del servidor (`GET /api/v1/hora`).
 
 ### Otros directorios
 

@@ -150,11 +150,36 @@ export function crearDatosDeDemostracion(ahora: Instante): DatosDeDemostracion {
     esEstudianteDeLaEscuela
   });
   const usuarios: UsuarioDeDemostracion[] = [
-    { usuario: "ana.estudiante", secreto: SECRETO_DE_DEMOSTRACION, identidad: identidad("est-ana", "Ana Rodríguez Mora", "2024012345", true) },
-    { usuario: "luis.estudiante", secreto: SECRETO_DE_DEMOSTRACION, identidad: identidad("est-luis", "Luis Pérez Solís", "2024067890", true) },
-    { usuario: "marta.coordinadora", secreto: SECRETO_DE_DEMOSTRACION, identidad: identidad("coord-c1", "Marta Jiménez Rojas", null, false) },
-    { usuario: "carlos.soporte", secreto: SECRETO_DE_DEMOSTRACION, identidad: identidad("soporte", "Carlos Quesada Araya", null, false) },
-    { usuario: "diego.asistente", secreto: SECRETO_DE_DEMOSTRACION, identidad: identidad("a1", "Diego Vargas Solano", "2022100001", true) }
+    {
+      usuario: "ana.estudiante",
+      secreto: SECRETO_DE_DEMOSTRACION,
+      identidad: identidad("est-ana", "Ana Rodríguez Mora", "2024012345", true),
+      descripcion: "Estudiante. Reserva máquinas en los laboratorios."
+    },
+    {
+      usuario: "luis.estudiante",
+      secreto: SECRETO_DE_DEMOSTRACION,
+      identidad: identidad("est-luis", "Luis Pérez Solís", "2024067890", true),
+      descripcion: "Estudiante con una reserva activa."
+    },
+    {
+      usuario: "marta.coordinadora",
+      secreto: SECRETO_DE_DEMOSTRACION,
+      identidad: identidad("coord-c1", "Marta Jiménez Rojas", null, false),
+      descripcion: "Coordinación del Laboratorio 1 (Cartago). Arma el horario y asigna turnos."
+    },
+    {
+      usuario: "carlos.soporte",
+      secreto: SECRETO_DE_DEMOSTRACION,
+      identidad: identidad("soporte", "Carlos Quesada Araya", null, false),
+      descripcion: "Coordinación de soporte. Ve todos los laboratorios y cierra el mes."
+    },
+    {
+      usuario: "diego.asistente",
+      secreto: SECRETO_DE_DEMOSTRACION,
+      identidad: identidad("a1", "Diego Vargas Solano", "2022100001", true),
+      descripcion: "Asistente y estudiante."
+    }
   ];
   const roles: Record<string, RolAsignado[]> = {
     "coord-c1": [{ rol: "COORDINADOR_LABORATORIO", idLaboratorio: "c1" }],

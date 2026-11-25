@@ -130,7 +130,7 @@ Leyenda: recuadro = rol; rectángulo = opción de la navegación principal, en o
 | `/ingresar` | Ingreso (en el núcleo: selector de rol simulado, 15.7) | Sin sesión | `POST /api/v1/sesion` | ✔ (simulado) |
 | `/` | Redirige al inicio del rol | Con sesión | `GET /api/v1/sesion` | ✔ |
 | `/reservar` | Disponibilidad y reserva | Estudiante, asistente | `GET /laboratorios`, `GET /laboratorios/{id}/disponibilidad`, `GET /reservas/mias`, `POST /reservas` | ✔ |
-| `/mis-reservas` | Mis reservas | Estudiante, asistente | `GET /reservas/mias` | |
+| `/mis-reservas` | Mis reservas | Estudiante, asistente | `GET /reservas/mias` | ✔ (consulta; cancelar y confirmar presentación quedan fuera) |
 | `/postulacion` | Postulación y su estado | Estudiante | (por definir) | |
 | `/mi-turno`, `/mis-turnos`, `/ofertas` | Vistas del asistente | Asistente | (por definir) | |
 | `/laboratorios/:id/horario` | Horario y asignación | Coord. de ese laboratorio, coord. soporte | `GET /laboratorios/{id}/turnos`, `GET /laboratorios/{id}/asistentes`, `POST /laboratorios/{id}/turnos` | ✔ |
@@ -308,6 +308,8 @@ El rojo no se usa para texto, porque a 4,0 : 1 no alcanza el 4,5 : 1 que exige e
 ## 15.10 Prototipo
 
 El prototipo navegable de alta fidelidad está en `docs/prototipo/` (instrucciones, paleta y exportación a Figma en su `README.md`). Implementa el selector de rol simulado, el esqueleto por rol de 15.2 a 15.4, los tres flujos de 15.6 y la identidad visual de 15.9, con un control para simular respuestas del servidor (normal, conflicto y sin respuesta).
+
+La aplicación real está en `frontend/` (React + TypeScript). Porta la hoja de estilos y la estructura de las pantallas del prototipo, pero con datos de la API: el selector de 15.7 lista los usuarios del Directorio de demostración, y los reintentos con la misma clave de solicitud son reales (ADR-0010). Las pantallas fuera del núcleo muestran el mismo estado vacío que en el prototipo. Diferencias: los avisos no tienen todavía bandeja en la API, así que la campana lleva a un estado vacío; el panel del coordinador de soporte muestra solo los meses por cerrar y los laboratorios; y la tipografía Roboto se sirve desde el propio sitio en lugar de Google Fonts (R-3).
 
 ## 15.11 Pendiente en esta sección
 - Prototipos de baja fidelidad (wireframes) para documentar la evolución del diseño.

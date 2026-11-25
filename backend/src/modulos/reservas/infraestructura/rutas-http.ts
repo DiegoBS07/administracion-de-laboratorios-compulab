@@ -2,10 +2,12 @@
 import type { FastifyInstance } from "fastify";
 import { claveDeSolicitud, exigirRol, exigirUsuario } from "../../../compartido/infraestructura/http.js";
 import type { ConsultarDisponibilidad } from "../aplicacion/consultar-disponibilidad.js";
+import type { ConsultarMisReservas } from "../aplicacion/consultar-mis-reservas.js";
 import type { ReservarMaquina } from "../aplicacion/reservar-maquina.js";
 
 export interface CasosDeReservas {
   consultarDisponibilidad: ConsultarDisponibilidad;
+  consultarMisReservas: ConsultarMisReservas;
   reservarMaquina: ReservarMaquina;
 }
 
@@ -26,6 +28,11 @@ export function registrarRutasDeReservas(app: FastifyInstance, casos: CasosDeRes
       return casos.consultarDisponibilidad.ejecutar(solicitud.params.idLaboratorio, solicitud.query.fecha);
     }
   );
+
+  app.get("/api/v1/reservas/mias", async (solicitud) => {
+    const usuario = exigirRol(solicitud, "ESTUDIANTE");
+    return casos.consultarMisReservas.ejecutar({ id: usuario.id });
+  });
 
   app.post<{ Body: { idMaquina: string; inicio: string; fin: string } }>(
     "/api/v1/reservas",

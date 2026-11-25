@@ -20,9 +20,9 @@ import { RelojFijo } from "../../dobles/reloj-fijo.js";
 
 const identidad = (idUsuario: string, esEstudianteDeLaEscuela: boolean) => ({ idUsuario, carne: null, nombre: `Persona ${idUsuario}`, correo: `${idUsuario}@tec.cr`, esEstudianteDeLaEscuela });
 const DIRECTORIO = new DirectorioDeDemostracion([
-  { usuario: "ana", secreto: "s3creto", identidad: identidad("est-ana", true) },
-  { usuario: "marta", secreto: "s3creto", identidad: identidad("coord-c1", false) },
-  { usuario: "visitante", secreto: "s3creto", identidad: identidad("otro", false) }
+  { usuario: "ana", secreto: "s3creto", identidad: identidad("est-ana", true), descripcion: "" },
+  { usuario: "marta", secreto: "s3creto", identidad: identidad("coord-c1", false), descripcion: "" },
+  { usuario: "visitante", secreto: "s3creto", identidad: identidad("otro", false), descripcion: "" }
 ]);
 const ROLES = new RepositorioRolesEnMemoria({ "coord-c1": [{ rol: "COORDINADOR_LABORATORIO", idLaboratorio: "c1" }] });
 

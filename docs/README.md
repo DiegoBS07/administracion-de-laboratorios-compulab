@@ -20,11 +20,11 @@ Este directorio es la **fuente oficial del diseño**. Nada se implementa en `bac
 | 8 | Clases | `09-clases.md` | Núcleo compartido (9.1), horarios (9.2), reservas (9.3), liquidación (9.4) e identidad (9.5) implementados |
 | 9 | Comportamiento | `10-comportamiento.md` | Realización interna de CU-06, CU-11 y CU-14; máquinas de estado de Turno y Reserva |
 | 10 | Patrones | `11-patrones.md` | Pendiente |
-| 11 | Trazabilidad | `12-trazabilidad.md` | Pendiente (los códigos ya están puestos para armarla) |
+| 11 | Trazabilidad | `12-trazabilidad.md` | Matriz del núcleo: alcance, RF y RN, contratos, QA y restricciones del curso hasta el código y las pruebas |
 | 12 | Evaluación grupal | `13-evaluacion-grupal.md` | Pendiente |
 | 13 | Bitácora individual | `14-bitacora-individual.md` | Pendiente |
-| 14 | Diseño UX/UI | `diseno-ux-ui.md` | Navegación por rol, rutas, flujos de las 3 pantallas del núcleo, identidad visual del TEC y prototipo navegable (`prototipo/`); wireframes y evaluación heurística pendientes |
-| 15 | Diseño de BD | `16-diseno-bd.md` | Pendiente |
+| 14 | Diseño UX/UI | `diseno-ux-ui.md` | Navegación por rol, rutas, flujos de las 3 pantallas del núcleo, identidad visual del TEC, prototipo navegable (`prototipo/`) y su implementación en `frontend/`; wireframes y evaluación heurística pendientes |
+| 15 | Diseño de BD | `16-diseno-bd.md` | Pendiente como documento propio; el modelo de datos implementado está en `07-arquitectura.md` (7.11) y `database/migrations/` |
 
 **Lo mínimo para empezar a programar** ya está: los tres casos de uso del núcleo ejecutable (CU-06, CU-11 y CU-14) tienen escenario, extensiones, contrato con invariantes y realización interna; los módulos tienen sus interfaces; y la API que consume el frontend está definida en `08-componentes.md`.
 

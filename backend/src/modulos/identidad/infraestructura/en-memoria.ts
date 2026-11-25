@@ -9,6 +9,8 @@ export interface UsuarioDeDemostracion {
   usuario: string;
   secreto: string;
   identidad: Identidad;
+  /** Qué puede hacer, para el selector de 15.7. */
+  descripcion: string;
 }
 
 const huella = (texto: string) => createHash("sha256").update(texto, "utf8").digest();
@@ -30,8 +32,8 @@ export class DirectorioDeDemostracion implements DirectorioInstitucional {
   }
 
   /** Para el selector de usuarios de la versión de demostración (diseno-ux-ui.md, 15.7). */
-  get usuarios(): { usuario: string; nombre: string }[] {
-    return [...this.#usuarios.values()].map((u) => ({ usuario: u.usuario, nombre: u.identidad.nombre }));
+  get usuarios(): { usuario: string; nombre: string; descripcion: string }[] {
+    return [...this.#usuarios.values()].map((u) => ({ usuario: u.usuario, nombre: u.identidad.nombre, descripcion: u.descripcion }));
   }
 }
 

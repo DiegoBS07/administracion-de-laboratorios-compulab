@@ -39,3 +39,4 @@ export { RepositorioMaquinasEnMemoria } from "./infraestructura/repositorio-maqu
 export { RepositorioReservasEnMemoria } from "./infraestructura/repositorio-reservas-en-memoria.js";
 export { type CasosDeReservas, registrarRutasDeReservas } from "./infraestructura/rutas-http.js";
 export { RepositorioMaquinasPostgres, RepositorioReservasPostgres } from "./infraestructura/repositorios-postgres.js";
+export { ConsultarMisReservas, type MisReservasDTO, type ReservaDelEstudianteDTO } from "./aplicacion/consultar-mis-reservas.js";

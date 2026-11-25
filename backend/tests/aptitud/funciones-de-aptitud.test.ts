@@ -72,7 +72,8 @@ async function codigoDeSalida(carpeta: string): Promise<number> {
 
 const reglas = (v: Violacion[]) => v.map((x) => x.regla);
 
-describe("funciones de aptitud", () => {
+// Cada prueba lanza dependency-cruiser como proceso aparte: con src/ completo tarda más que los 5 s por omisión.
+describe("funciones de aptitud", { timeout: 60_000 }, () => {
   it("el código real de src/ no viola ninguna regla", async () => {
     expect(await violacionesEn(RAIZ)).toEqual([]);
   });

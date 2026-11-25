@@ -40,7 +40,7 @@ export interface CasosDeSesion {
   iniciarSesion: IniciarSesion;
   cerrarSesion: CerrarSesion;
   /** Solo en la versión de demostración: usuarios para el selector de 15.7. */
-  usuariosDeDemostracion: (() => { usuario: string; nombre: string }[]) | null;
+  usuariosDeDemostracion: (() => { usuario: string; nombre: string; descripcion: string }[]) | null;
 }
 
 export function registrarRutasDeSesion(app: FastifyInstance, casos: CasosDeSesion, opciones: OpcionesDeSesionHttp): void {

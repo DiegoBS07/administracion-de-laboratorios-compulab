@@ -176,12 +176,12 @@ Leyenda: óvalo = raíz; rectángulo = característica ISO 25010 o escenario (ho
 
 | QA | Tácticas | Dónde se ve |
 | --- | --- | --- |
-| QA-1 | Índices por asistente-fecha, laboratorio-fecha y máquina-fecha; transacciones cortas; presupuesto de latencia | `07-arquitectura.md` (7.6), `16-diseno-bd.md` (pendiente) |
+| QA-1 | Índices por asistente-fecha, laboratorio-fecha y máquina-fecha; transacciones cortas; presupuesto de latencia | `07-arquitectura.md` (7.6 y 7.11) y `database/migrations/` |
 | QA-2 | `restart: unless-stopped`, healthchecks, volumen persistente, respaldo diario, tareas que procesan lo pendiente | `docker-compose.yml`, ADR-0003, ADR-0004 |
 | QA-3 | Base de datos y contenedores dedicados, límites de memoria, sesión propia | `07-arquitectura.md`, ADR-0008 |
 | QA-4 | Bloqueo por asistente, restricciones `EXCLUDE` y de unicidad, transacción por caso de uso, claves de solicitud | ADR-0009, ADR-0010 |
 | QA-5 | Tarifas y recargo como datos con vigencia; copia en cada cierre | ADR-0005 |
 | QA-6 | Puertos y adaptadores; reloj inyectado; funciones de aptitud | ADR-0001, `07-arquitectura.md` (7.5) |
 | QA-7 | Verificación de rol y laboratorio en cada caso de uso; bitácora de seguridad con identificador de solicitud | `08-componentes.md`, `07-arquitectura.md` (7.8) |
-| QA-8 | Diseño móvil primero para la vista del asistente | `diseno-ux-ui.md` (pendiente) |
+| QA-8 | Diseño móvil primero para la vista del asistente | `diseno-ux-ui.md` (N-10, 15.2) y `frontend/` |
 | QA-9 | Tiempo de espera, un reintento con espera aleatoria, interruptor, fallar cerrado, sesión propia | ADR-0008, ADR-0011, `08-componentes.md` |
