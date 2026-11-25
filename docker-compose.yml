@@ -1,5 +1,4 @@
 # CompuLab: contenedores definidos en Context/Servicios.md
-# El servicio frontend se agregará cuando exista frontend/Dockerfile.
 # Antes de levantar: copie .env.example como .env y ajuste los valores.
 
 name: compulab
@@ -78,6 +77,30 @@ services:
       retries: 3
       start_period: 15s
     mem_limit: 512m
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: compulab-frontend:latest
+    environment:
+      # Nginx reenvía /api a esta dirección dentro de la red de compose
+      BACKEND_URL: http://backend:${APP_PORT}
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    networks:
+      - compulab_network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    mem_limit: 128m
     restart: unless-stopped
 
 networks:
