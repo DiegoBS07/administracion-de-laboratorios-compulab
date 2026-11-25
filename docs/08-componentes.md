@@ -137,8 +137,8 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 ### Contrato · `CoberturaDeLaboratorio`
 | Parte | Contenido |
 | --- | --- |
-| Sintaxis | `franjasAbiertas(idLaboratorio: string, desde: Instante, hasta: Instante): Promise<Franja[]>` |
-| Semántica | **Pre:** `desde` < `hasta`. **Post:** devuelve, ordenadas y sin traslapes, las franjas dentro de [desde, hasta] en que el laboratorio estará abierto según sus turnos `ASIGNADO` o `EN_CURSO`; dos turnos contiguos forman una sola franja. No cuenta turnos pendientes de aceptación, vacantes ni descartados (RN-15). No tiene efectos. |
+| Sintaxis | `franjasAbiertas(idLaboratorio: string, periodo: Franja): Promise<Franja[]>` |
+| Semántica | **Pre:** ninguna (la `Franja` ya garantiza inicio < fin). **Post:** devuelve, ordenadas y sin traslapes, las franjas dentro del periodo en que el laboratorio estará abierto según sus turnos `ASIGNADO` o `EN_CURSO`; dos turnos contiguos forman una sola franja. No cuenta turnos pendientes de aceptación, vacantes ni descartados (RN-15). No tiene efectos. |
 | Errores | `LaboratorioNoExiste`. Un periodo sin turnos devuelve lista vacía, no error. |
 | Calidad de servicio | ≤ 50 ms para un periodo de un día; se puede llamar las veces que sea. |
 | Versión | v1. Agregar campos a `Franja` no rompe; cambiar qué estados cuentan sí rompe. |
@@ -158,18 +158,19 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 ### Interfaz provista
 | Operación | Semántica | Errores |
 | --- | --- | --- |
-| `ReservarMaquina.ejecutar(usuario, SolicitudReserva): ReservaDTO` | CU-11 (contrato completo en `04-casos-de-uso.md`). Crea una reserva activa; con una clave ya usada devuelve la reserva existente. | `FranjaDeReservaInvalida`, `FueraDeHorizonteDeReserva`, `ReservaExcedeDuracion`, `LaboratorioCerradoEnFranja`, `MaquinaFueraDeServicio`, `MaquinaNoDisponible`, `YaTieneReservaActiva`, `LimiteSemanalDeReservaExcedido`, `MaquinaNoExiste`, `ClaveDeSolicitudReutilizada` |
-| `ConsultarDisponibilidad.ejecutar(idLaboratorio, fecha): DisponibilidadDTO` | RF-22. Franjas abiertas y estado de cada máquina con sus reservas del día. | `LaboratorioNoExiste` |
+| `ReservarMaquina.ejecutar(usuario, SolicitudReserva): { creada, reserva: ReservaDTO }` | CU-11 (contrato completo en `04-casos-de-uso.md`). Crea una reserva activa; con una clave ya usada devuelve la reserva existente con `creada: false`. **Implementado** en `backend/src/modulos/reservas/`. | `FranjaDeReservaInvalida`, `FueraDeHorizonteDeReserva`, `ReservaExcedeDuracion`, `LaboratorioCerradoEnFranja`, `MaquinaFueraDeServicio`, `MaquinaNoDisponible`, `YaTieneReservaActiva`, `LimiteSemanalDeReservaExcedido`, `MaquinaNoExiste`, `ClaveDeSolicitudReutilizada` |
+| `ConsultarDisponibilidad.ejecutar(idLaboratorio, fecha): DisponibilidadDTO` | RF-22. Franjas abiertas y estado de cada máquina con sus reservas activas del día; un día sin franjas devuelve la lista vacía (CU-11 ext 2a). **Implementado.** | `LaboratorioNoExiste` |
 | `UsoDeMaquinas.delPeriodo(idLaboratorio, desde, hasta)` | Horas reservadas con presentación y periodos fuera de servicio por máquina (lo usa reportes). | `LaboratorioNoExiste` |
 
 ### Interfaces requeridas
 | Puerto | Operaciones | Para qué |
 | --- | --- | --- |
 | `RepositorioMaquinas` | `porId(idMaquina): Maquina \| null`; `delLaboratorio(idLaboratorio): Maquina[]` | Estado de servicio (RN-20) y laboratorio de la máquina. |
-| `RepositorioReservas` | `porClaveDeSolicitud(idEstudiante, clave): Reserva \| null`; `activaDelEstudiante(idEstudiante): Reserva \| null`; `delEstudianteEnSemana(idEstudiante, semana): Reserva[]`; `deMaquinaEntre(idMaquina, desde, hasta): Reserva[]`; `guardar(reserva): void` | Ext 7b; RN-17; traslape por máquina; registrar. `guardar` lanza `MaquinaNoDisponible` o `YaTieneReservaActiva` si una restricción de la base salta (ext 7a, 7c). |
+| `RepositorioReservas` | `porClaveDeSolicitud(idEstudiante, clave): Reserva \| null`; `activaDelEstudiante(idEstudiante): Reserva \| null`; `delEstudianteEnSemana(idEstudiante, semana): Reserva[]`; `deMaquinaEntre(idMaquina, franja): Reserva[]`; `guardar(reserva): void` | Ext 7b; RN-17; traslape por máquina; registrar. `guardar` lanza `MaquinaNoDisponible` o `YaTieneReservaActiva` si una restricción de la base salta (ext 7a, 7c). |
 | `UnidadDeTrabajo` | ver 8.3 | Todo o nada. |
-| `CoberturaDeLaboratorio` | ver 8.4 | RN-15. |
-| `Reloj` | ver 8.3 | Inicio en el futuro, horizonte de 7 días. |
+| `CoberturaDeLaboratorio` | ver 8.4 (declarada de nuevo en reservas, con su propio `LaboratorioNoExiste`; el puente de `arranque/` traduce) | RN-15. |
+| `GeneradorDeIds` | `nuevo(): string` | Identificador de la reserva nueva (R-6). |
+| `Reloj` | ver 8.3 | Inicio en el futuro, hoy o los 6 días siguientes. |
 
 ## 8.6 Módulo liquidacion
 

@@ -95,7 +95,7 @@ Columna **Núcleo**: ✔ = se implementa en el núcleo ejecutable; vacío = se d
 
 ### Máquinas y reservas
 - **RN-15** Solo se reserva dentro de una franja completamente cubierta por turnos asignados o en curso del laboratorio de la máquina (pueden ser turnos contiguos de asistentes distintos). No cuentan los turnos pendientes de aceptación, vacantes ni descartados.
-- **RN-16** Una reserva dura como máximo 2 horas, su inicio es menor que su fin, empieza en el futuro y se hace con no más de 7 días de anticipación (SUP-15).
+- **RN-16** Una reserva dura como máximo 2 horas, su inicio es menor que su fin, empieza en el futuro y su día es hoy o alguno de los 6 días siguientes: 7 días contando hoy (SUP-15).
 - **RN-17** Un estudiante tiene como máximo **una** reserva activa a la vez y como máximo **6 horas** reservadas por semana. Para las 6 horas cuentan las reservas activas, en uso, finalizadas y liberadas por no presentación; no cuentan las canceladas.
 - **RN-18** Si el estudiante no confirma su presentación dentro de los primeros 15 minutos, la reserva se libera sola y la máquina queda disponible.
 - **RN-19** Si un turno queda vacante o no cubierto, las reservas de esa franja se cancelan y se avisa a cada estudiante (SUP-24).

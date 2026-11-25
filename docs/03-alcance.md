@@ -80,7 +80,7 @@ Donde el enunciado es ambiguo se adopta el supuesto de la tabla para poder avanz
 | SUP-12 | Qué son "los asistentes del mismo laboratorio". | Asistentes activos que tienen al menos un turno en ese laboratorio en el semestre o que lo declararon en su postulación. | RN-10 |
 | SUP-13 | Cómo se registra que el estudiante "se presentó". | El estudiante confirma presentación desde su celular en el laboratorio, o lo confirma el asistente de turno. | RF-25, RN-18 |
 | SUP-14 | Cómo se comprueba que el asistente marca "en la puerta del laboratorio". | Con un código del laboratorio (por ejemplo QR) detrás del puerto `VerificadorPresencia`. El mecanismo concreto será un ADR. | RF-18 |
-| SUP-15 | Con cuánta anticipación se reserva y qué cuenta para las 6 h. | Hasta 7 días antes. Cuentan reservas activas, en uso, finalizadas y liberadas por no presentación; no cuentan las canceladas. | RN-16, RN-17 |
+| SUP-15 | Con cuánta anticipación se reserva y qué cuenta para las 6 h. | Para hoy o para alguno de los 6 días siguientes (7 días contando hoy, como los ofrece la pantalla de reserva). Cuentan reservas activas, en uso, finalizadas y liberadas por no presentación; no cuentan las canceladas. | RN-16, RN-17 |
 | SUP-16 | Qué es "cuánto se usaron" las máquinas. | Horas de reserva con presentación ÷ (horas con el laboratorio abierto × máquinas en servicio), por laboratorio y semana. | RF-29 |
 | SUP-17 | Cambio de tarifa o recargo a mitad de mes. | Se aplica el valor vigente en la fecha del turno; el cierre guarda una copia de los valores aplicados. | RN-22, RN-23 |
 | SUP-18 | Quién crea laboratorios, máquinas y asigna coordinadores. | El coordinador de soporte. | RF-02, RF-30 |

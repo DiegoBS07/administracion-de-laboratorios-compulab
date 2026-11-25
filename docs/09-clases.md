@@ -2,7 +2,7 @@
 
 > Responde: ¿qué clases tiene el dominio, qué invariantes protegen y quién usa a quién?
 > Reglas de construcción (R-7): atributos privados (`#campo`), constructor privado y fábricas estáticas que verifican las invariantes antes de crear el objeto; los objetos valor son inmutables. Nada de modelo anémico: la regla vive en la clase que tiene los datos.
-> Versión 2026-11-24. Se completa sección por sección de la implementación: 9.1 y 9.2 están implementadas; 9.3 y 9.4 se escriben al empezar la sección de cada caso de uso.
+> Versión 2026-11-24. Se completa sección por sección de la implementación: 9.1, 9.2 y 9.3 están implementadas; 9.4 se escribe al empezar la sección 5.
 
 ## 9.1 Núcleo compartido (`backend/src/compartido/dominio/`)
 
@@ -185,8 +185,100 @@ Siete dependencias en `AsignarTurno` (más el `Reloj`): la revisión de 10.1 lo 
 
 **Dobles de prueba:** `tests/modulos/horarios/dobles.ts` (repositorio en memoria con bloqueo por asistente y restricciones como las de la base, consulta de asistentes, calendario y autorización fijos) y `tests/dobles/` (`UnidadDeTrabajoEnMemoria` con transacciones aisladas, `NotificadorEnMemoria`, `GeneradorDeIdsSecuencial`, `RelojFijo`).
 
-## 9.3 Módulo reservas (CU-11)
-Pendiente: sección 4. Clases previstas: `Reserva`, `Maquina`, `AgendaDeLaMaquina`, `CupoSemanalDelEstudiante`.
+## 9.3 Módulo reservas (CU-11) · `backend/src/modulos/reservas/`
+
+```mermaid
+---
+title: CompuLab · Clases del módulo reservas (CU-11) · 2026-11-24
+---
+classDiagram
+    direction LR
+    class ReservarMaquina {
+        <<aplicación>>
+        +ejecutar(usuario, solicitud) ResultadoReservarMaquina
+    }
+    class ConsultarDisponibilidad {
+        <<aplicación>>
+        +ejecutar(idLaboratorio, fecha) DisponibilidadDTO
+    }
+    class Reserva {
+        -id
+        -idEstudiante
+        -idMaquina
+        -franja: Franja
+        -estado: EstadoReserva
+        -claveSolicitud
+        +crear(solicitud)$ Reserva
+        +reconstituir(datos)$ Reserva
+        +limitePresentacion: Instante
+        +estaActiva() boolean
+        +cuentaParaElLimiteSemanal() boolean
+        +chocaCon(franja) boolean
+    }
+    class Maquina {
+        -id
+        -idLaboratorio
+        -codigo
+        -enServicio
+        +verificarReservable()
+    }
+    class AgendaDeLaMaquina {
+        -reservas: Reserva[]
+        +verificarLibre(franja)
+        +franjasOcupadas() Franja[]
+    }
+    class CupoSemanalDelEstudiante {
+        -semana
+        -reservasDeLaSemana
+        -reservaActiva
+        +minutosReservados: number
+        +verificarQueAdmite(reserva)
+    }
+    class POLITICA_DE_RESERVAS {
+        <<constantes>>
+        duracionMaximaMinutos = 120
+        limiteSemanalMinutos = 360
+        diasDeAnticipacion = 6
+        toleranciaPresentacionMinutos = 15
+    }
+    class RepositorioReservas { <<interface>> }
+    class RepositorioMaquinas { <<interface>> }
+    class CoberturaDeLaboratorio { <<interface>> }
+    class UnidadDeTrabajo { <<interface>> }
+    class GeneradorDeIds { <<interface>> }
+    ReservarMaquina ..> Reserva : crea
+    ReservarMaquina ..> Maquina : pide verificar
+    ReservarMaquina ..> AgendaDeLaMaquina : pide verificar
+    ReservarMaquina ..> CupoSemanalDelEstudiante : pide verificar
+    ReservarMaquina --> RepositorioReservas
+    ReservarMaquina --> RepositorioMaquinas
+    ReservarMaquina --> CoberturaDeLaboratorio
+    ReservarMaquina --> UnidadDeTrabajo
+    ReservarMaquina --> GeneradorDeIds
+    ConsultarDisponibilidad --> CoberturaDeLaboratorio
+    ConsultarDisponibilidad ..> AgendaDeLaMaquina
+    AgendaDeLaMaquina o-- Reserva
+    CupoSemanalDelEstudiante o-- Reserva
+    Reserva ..> POLITICA_DE_RESERVAS
+    CupoSemanalDelEstudiante ..> POLITICA_DE_RESERVAS
+```
+
+Leyenda: igual que 9.1 y 9.2; `<<constantes>>` = límites de uso agrupados en un solo lugar. `ReservarMaquina` también usa el puerto `Reloj`.
+
+| Clase | Responsabilidad | Invariantes verificadas al crear | Errores que lanza | Reglas |
+| --- | --- | --- | --- | --- |
+| `Reserva` | Una máquina reservada por un estudiante en una franja | Empieza en el futuro; su día es hoy o uno de los 6 siguientes; dura como máximo 2 h; identificadores y clave no vacíos | `FranjaDeReservaInvalida`, `FueraDeHorizonteDeReserva`, `ReservaExcedeDuracion`, `DatoInvalido` | RN-16, RN-18 (límite de presentación), I4, I5 |
+| `EstadoReserva` | Los 6 estados de 10.5 | — | — | Activa: `ACTIVA` y `EN_USO`. Para las 6 h cuentan además `FINALIZADA` y `LIBERADA` (SUP-15) |
+| `Maquina` | Qué máquina es, de qué laboratorio y si está en servicio | Identificador, laboratorio y código no vacíos | `MaquinaFueraDeServicio` | RN-20 |
+| `AgendaDeLaMaquina` | Las reservas de una máquina; sabe si está libre | Todas las reservas son de esa máquina | `MaquinaNoDisponible` | I1 |
+| `CupoSemanalDelEstudiante` | Lo que el estudiante puede reservar todavía | Reservas del estudiante y de esa semana; la reserva activa está activa | `YaTieneReservaActiva`, `LimiteSemanalDeReservaExcedido` | RN-17, I2, I3 |
+| `POLITICA_DE_RESERVAS` | Los límites de uso en un solo lugar (guía de cambios 7.10) | — | — | RN-16 a RN-18 |
+| `ReservarMaquina` (aplicación) | Coordina CU-11 paso por paso | — | `MaquinaNoExiste`, `LaboratorioCerradoEnFranja`, `ClaveDeSolicitudReutilizada` y los del dominio | CU-11, RN-15, ADR-0009, ADR-0010 |
+| `ConsultarDisponibilidad` (aplicación) | Consulta de franjas abiertas y estado de las máquinas; no cambia nada | — | `LaboratorioNoExiste` | RF-22, CU-11 ext 2a |
+
+**Concurrencia (ADR-0009):** reservas no necesita bloqueo. La exclusión por máquina rechaza dos reservas simultáneas de la misma máquina (ext 7a) y el índice de una reserva activa por estudiante rechaza dos del mismo estudiante (ext 7c). Como solo puede haber una activa, dos reservas simultáneas tampoco pueden sumar más de 6 h.
+
+**Dobles de prueba:** `tests/modulos/reservas/dobles.ts` (repositorio de reservas con esas restricciones, repositorio de máquinas y `CoberturaFija`), más los dobles comunes de `tests/dobles/`.
 
 ## 9.4 Módulo liquidación (CU-14)
 Pendiente: sección 5. Clases previstas: `MesDeLiquidacion`, `TarifasDelPeriodo`, `LiquidacionDelAsistente`, `LineaDeLiquidacion`, `CierreMensual`.
