@@ -30,3 +30,23 @@ export {
 } from "./dominio/errores.js";
 export { Turno } from "./dominio/turno.js";
 export type { EstadoTurno } from "./dominio/estado-turno.js";
+export {
+  type AsistenteParaElegirDTO,
+  ConsultarAsistentesDelLaboratorio,
+  ConsultarCobertura,
+  ConsultarHorario,
+  ConsultarTurnosProgramados,
+  type HorarioSemanalDTO,
+  ListarLaboratorios,
+  type TurnoProgramadoDTO
+} from "./aplicacion/consultas.js";
+export type {
+  AsistenteDelLaboratorio,
+  AsistentesDelLaboratorio,
+  BloqueDeDisponibilidadDTO,
+  CatalogoDeLaboratorios,
+  Laboratorio
+} from "./aplicacion/puertos.js";
+export { LaboratorioNoExiste } from "./aplicacion/errores.js";
+export { RepositorioTurnosEnMemoria } from "./infraestructura/repositorio-turnos-en-memoria.js";
+export { type CasosDeHorarios, registrarRutasDeHorarios } from "./infraestructura/rutas-http.js";

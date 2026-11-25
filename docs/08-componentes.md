@@ -8,7 +8,7 @@
 
 | Módulo | Actor ante el que responde | Razón de cambio | Interfaz provista (`index.ts`) | Interfaces requeridas | Núcleo |
 | --- | --- | --- | --- | --- | --- |
-| **horarios** | Coord. laboratorio | Reglas de armado del horario y cambios de turno | `AsignarTurno`, `ConsultarHorario`, `CoberturaDeLaboratorio`, `TurnosProgramados` | `RepositorioTurnos`, `UnidadDeTrabajo`, `ConsultaAsistentes`, `CalendarioAcademico`, `Autorizacion`, `Notificador`, `Reloj` | ✔ |
+| **horarios** | Coord. laboratorio | Reglas de armado del horario y cambios de turno | `AsignarTurno`, `ConsultarHorario`, `ListarLaboratorios`, `ConsultarAsistentesDelLaboratorio`, `CoberturaDeLaboratorio`, `TurnosProgramados` | `RepositorioTurnos`, `UnidadDeTrabajo`, `ConsultaAsistentes`, `AsistentesDelLaboratorio`, `CatalogoDeLaboratorios`, `CalendarioAcademico`, `Autorizacion`, `Notificador`, `Reloj` | ✔ |
 | **reservas** | Estudiante | Reglas de uso de máquinas | `ReservarMaquina`, `ConsultarDisponibilidad`, `UsoDeMaquinas` | `RepositorioMaquinas`, `RepositorioReservas`, `UnidadDeTrabajo`, `CoberturaDeLaboratorio`, `Reloj` | ✔ |
 | **liquidacion** | Coord. soporte (pago) y Becas (formato) | Reglas de pago, tarifas y formato de Becas | `CerrarMes`, `ConsultarCierre`, `ObtenerArchivoBecas` | `RepositorioCierres`, `HorasTrabajadas`, `DatosDeAsistentes`, `TablaTarifas`, `GeneradorArchivoBecas`, `Notificador`, `Reloj` | ✔ |
 | asistencia | Asistente | Reglas de marcas y cobertura real | `RegistrarMarca`, `HorasTrabajadas` | `RepositorioMarcas`, `TurnosProgramados`, `VerificadorPresencia`, `Notificador`, `Reloj` | |
@@ -67,7 +67,7 @@ Si no se puede nombrar la implementación que sustituiría a una pieza sin tocar
 | Pieza | Implementación actual | Se puede reemplazar por… | Quién no se entera |
 | --- | --- | --- | --- |
 | Módulo `horarios` (vía `CoberturaDeLaboratorio`) | Turnos asignados en CompuLab | Un calendario de apertura publicado por la Escuela | `reservas` |
-| `RepositorioTurnos`, `RepositorioReservas`, `RepositorioCierres` | PostgreSQL con Kysely | Repositorios en memoria (pruebas) | Casos de uso y dominio |
+| `RepositorioTurnos`, `RepositorioReservas`, `RepositorioCierres` | PostgreSQL con Kysely (sección 7) | Repositorios en memoria: los usan las pruebas y el núcleo ejecutable mientras no hay base de datos | Casos de uso y dominio |
 | `TablaTarifas` | Tabla de vigencias en PostgreSQL | Tarifas fijas (pruebas) o un catálogo publicado por la Coordinación | `CerrarMes` |
 | `GeneradorArchivoBecas` | CSV (SUP-03) | XLSX o el formato nuevo que defina Becas | Dominio de liquidación |
 | `DirectorioInstitucional` | Adaptador LDAP | Adaptador OIDC, o un doble con usuarios fijos | Todo lo que usa `Autorizacion` |
@@ -130,9 +130,11 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 | Operación | Semántica | Errores |
 | --- | --- | --- |
 | `AsignarTurno.ejecutar(usuario, SolicitudAsignarTurno): { creado, turno: TurnoAsignadoDTO }` | CU-06 (contrato completo en `04-casos-de-uso.md`). Crea un turno asignado o pendiente de aceptación; con una clave ya usada devuelve el turno existente con `creado: false` (la API responde 200 en lugar de 201). **Implementado** en `backend/src/modulos/horarios/`. | `SinPermisoSobreLaboratorio`, `FranjaDeTurnoInvalida`, `FueraDelSemestre`, `TurnoEnElPasado`, `AsistenteNoExiste`, `AsistenteNoActivo`, `TraslapeDeTurno`, `FranjaOcupadaEnLaboratorio`, `TopeSemanalExcedido`, `ClaveDeSolicitudReutilizada` |
-| `ConsultarHorario.ejecutar(idLaboratorio, semana): HorarioSemanalDTO` | RF-11. Turnos del laboratorio en la semana. | `LaboratorioNoExiste` |
-| `CoberturaDeLaboratorio.franjasAbiertas(idLaboratorio, desde, hasta): Franja[]` | Ver contrato abajo. | `LaboratorioNoExiste` |
-| `TurnosProgramados.delPeriodo(desde, hasta): TurnoProgramadoDTO[]` | Turnos con responsable, franja y estado en el periodo (lo usa asistencia). | — |
+| `ConsultarHorario.ejecutar(idLaboratorio, lunes): HorarioSemanalDTO` | RF-11. Turnos del laboratorio en la semana que empieza ese lunes; `asistente` es `null` en un turno vacante. **Implementado.** | `LaboratorioNoExiste`, `DatoInvalido` (no es lunes) |
+| `ListarLaboratorios.ejecutar(): Laboratorio[]` | `{ id, nombre, campus }` ordenados por nombre. **Implementado.** | — |
+| `ConsultarAsistentesDelLaboratorio.ejecutar(idLaboratorio, lunes): AsistenteParaElegirDTO[]` | Asistentes activos del laboratorio con categoría, tope, minutos ya programados en la semana (RN-07) y disponibilidad. **Implementado.** | `LaboratorioNoExiste` |
+| `CoberturaDeLaboratorio.franjasAbiertas(idLaboratorio, periodo): Franja[]` | Ver contrato abajo. **Implementado** como `ConsultarCobertura`. | `LaboratorioNoExiste` |
+| `TurnosProgramados.delPeriodo(periodo): TurnoProgramadoDTO[]` | Turnos de todos los laboratorios que empiezan en el periodo, con responsable, franja y estado (lo usan asistencia y liquidación). **Implementado** como `ConsultarTurnosProgramados`. | — |
 
 ### Contrato · `CoberturaDeLaboratorio`
 | Parte | Contenido |
@@ -146,9 +148,11 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 ### Interfaces requeridas
 | Puerto | Operaciones | Para qué |
 | --- | --- | --- |
-| `RepositorioTurnos` | `porClaveDeSolicitud(idUsuario, clave): Turno \| null`; `bloquearAgendaDe(idAsistente): void`; `delAsistenteEntre(idAsistente, franja): Turno[]`; `delLaboratorioEntre(idLaboratorio, franja): Turno[]`; `guardar(turno): void` | Ext 5b (ADR-0010); serializar asignaciones al mismo asistente (ADR-0009); validar RN-06, RN-07, RN-09; registrar. `guardar` lanza `TraslapeDeTurno` o `FranjaOcupadaEnLaboratorio` si una restricción de la base salta. |
+| `RepositorioTurnos` | `porClaveDeSolicitud(idUsuario, clave): Turno \| null`; `bloquearAgendaDe(idAsistente): void`; `delAsistenteEntre(idAsistente, franja): Turno[]`; `delLaboratorioEntre(idLaboratorio, franja): Turno[]`; `delPeriodo(franja): Turno[]`; `guardar(turno): void` | Ext 5b (ADR-0010); serializar asignaciones al mismo asistente (ADR-0009); validar RN-06, RN-07, RN-09; registrar. `guardar` lanza `TraslapeDeTurno` o `FranjaOcupadaEnLaboratorio` si una restricción de la base salta. |
 | `UnidadDeTrabajo` | ver 8.3 | Todo o nada. |
 | `ConsultaAsistentes` | `obtener(idAsistente): AsistenteParaHorario \| null` → `{ id, nombre, activo, topeSemanalMinutos, disponibilidad: Bloque[] }` | Validar RN-04, RN-07, RN-08. |
+| `AsistentesDelLaboratorio` | `activosDe(idLaboratorio): AsistenteDelLaboratorio[]` → lo mismo más `categoria` | Lista para elegir en la pantalla de CU-06. |
+| `CatalogoDeLaboratorios` | `todos(): Laboratorio[]`; `porId(idLaboratorio): Laboratorio \| null` | `LaboratorioNoExiste` en las consultas. |
 | `CalendarioAcademico` | `semestreVigente(): { inicio: Fecha, fin: Fecha } \| null` | Validar que la fecha esté dentro del semestre. |
 | `GeneradorDeIds` | `nuevo(): string` | Identificador del turno nuevo, sin que el dominio genere números aleatorios (R-6). |
 | `Autorizacion`, `Notificador`, `Reloj` | ver 8.3 | Ext 2a, ext 4d, ext 3c. |
@@ -180,11 +184,12 @@ Formato de contrato: las cinco partes del material de clase (sintaxis, semántic
 | `CerrarMes.ejecutar(anio, mes): ResumenDeCierreDTO` | CU-14 (contrato completo en `04-casos-de-uso.md`). Idempotente por mes (RN-26). | `MesNoTerminado`, `TarifaNoDefinida`, `ErrorAlGenerarArchivo` |
 | `ConsultarCierre.ejecutar(anio, mes): ResumenDeCierreDTO` | Cierre ya hecho. | `CierreNoExiste` |
 | `ObtenerArchivoBecas.ejecutar(anio, mes): ArchivoDTO` | Nombre, tipo `text/csv` y contenido del archivo guardado. | `CierreNoExiste` |
+| `ListarCierresDelAnio.ejecutar(anio): MesDelAnioDTO[]` | Meses del año que ya empezaron, cada uno `CERRADO`, `POR_CERRAR` o `EN_CURSO`. **Implementado.** | `DatoInvalido` |
 
 ### Interfaces requeridas
 | Puerto | Operaciones | Para qué |
 | --- | --- | --- |
-| `RepositorioCierres` | `porMes(mes: MesDeLiquidacion): CierreMensual \| null`; `guardar(cierre): void` | RN-25, RN-26, garantía mínima. `guardar` es todo o nada; si ya existe un cierre del mes (ext 2c), lanza `CierreYaExiste` y el caso de uso devuelve el existente. |
+| `RepositorioCierres` | `porMes(mes: MesDeLiquidacion): CierreMensual \| null`; `delAnio(anio): CierreMensual[]`; `guardar(cierre): void` | RN-25, RN-26, garantía mínima. `guardar` es todo o nada; si ya existe un cierre del mes (ext 2c), lanza `CierreYaExiste` y el caso de uso devuelve el existente. |
 | `HorasTrabajadas` | `delPeriodo(periodo: Franja): RegistroDeTurnoTrabajado[]` → `{ idAsistente, idTurno, inicioProgramado, finProgramado, entrada \| null, salida \| null, estado }` | Pasos 3 y 4. Devuelve los turnos que empiezan en el periodo, que va del lunes de la primera semana del mes al día 1 del mes siguiente (SUP-05). |
 | `DatosDeAsistentes` | `obtener(idAsistente): { carne, nombre, categoria, topes: [{ minutosPorSemana, vigenteDesde }] }` | Categoría, historial de topes y datos del archivo. |
 | `TablaTarifas` | `vigenciasEntre(desde, hasta): VigenciaDeTarifas[]` | RN-22, RN-23. El dominio elige el valor de cada fecha. |
@@ -235,8 +240,8 @@ Es la interfaz provista del contenedor `backend` y el acuerdo que permite trabaj
 | --- | --- |
 | 400 | `SOLICITUD_INVALIDA` (formato, campos faltantes o falta `Idempotency-Key`) |
 | 401 | `NO_AUTENTICADO`, `CREDENCIALES_INVALIDAS` |
-| 403 | `SIN_PERMISO_SOBRE_LABORATORIO` |
-| 404 | `LABORATORIO_NO_EXISTE`, `MAQUINA_NO_EXISTE`, `CIERRE_NO_EXISTE`, `ASISTENTE_NO_EXISTE` |
+| 403 | `SIN_PERMISO_SOBRE_LABORATORIO`, `SIN_PERMISO` (el rol de la sesión no permite la operación) |
+| 404 | `LABORATORIO_NO_EXISTE`, `MAQUINA_NO_EXISTE`, `CIERRE_NO_EXISTE`, `ASISTENTE_NO_EXISTE`, `RECURSO_NO_ENCONTRADO` (la ruta no existe) |
 | 409 | `TRASLAPE_DE_TURNO`, `FRANJA_OCUPADA_EN_LABORATORIO`, `MAQUINA_NO_DISPONIBLE`, `YA_TIENE_RESERVA_ACTIVA` |
 | 422 | `FRANJA_DE_TURNO_INVALIDA`, `FUERA_DEL_SEMESTRE`, `TURNO_EN_EL_PASADO`, `ASISTENTE_NO_ACTIVO`, `TOPE_SEMANAL_EXCEDIDO`, `FRANJA_DE_RESERVA_INVALIDA`, `FUERA_DE_HORIZONTE_DE_RESERVA`, `RESERVA_EXCEDE_DURACION`, `LABORATORIO_CERRADO_EN_FRANJA`, `MAQUINA_FUERA_DE_SERVICIO`, `LIMITE_SEMANAL_DE_RESERVA_EXCEDIDO`, `MES_NO_TERMINADO`, `TARIFA_NO_DEFINIDA`, `CLAVE_DE_SOLICITUD_REUTILIZADA` |
 | 500 | `ERROR_AL_GENERAR_ARCHIVO`, `ERROR_INTERNO` (nunca por una regla de negocio) |
@@ -245,15 +250,16 @@ Es la interfaz provista del contenedor `backend` y el acuerdo que permite trabaj
 ### Sesión (navegación por rol, `diseno-ux-ui.md`)
 | Método y ruta | Uso | Respuesta |
 | --- | --- | --- |
-| `POST /api/v1/sesion` | Iniciar sesión. Cuerpo: `{ usuario, secreto }`. En el núcleo ejecutable lo reemplaza el selector de rol simulado. | `201 { id, nombre, roles: [{ rol: "ESTUDIANTE" \| "ASISTENTE" \| "COORDINADOR_LABORATORIO" \| "COORDINADOR_SOPORTE", idLaboratorio? }] }` · `401 CREDENCIALES_INVALIDAS` · `503 DIRECTORIO_NO_DISPONIBLE` |
+| `POST /api/v1/sesion` | Iniciar sesión. Cuerpo: `{ usuario, secreto }`. Deja la cookie `compulab_sesion` (`HttpOnly`, `SameSite=Lax`, 8 h). En el núcleo ejecutable autentica contra un Directorio de demostración; el selector de 15.7 envía el usuario elegido con la contraseña `demo`. | `201 { id, nombre, roles: [{ rol: "ESTUDIANTE" \| "ASISTENTE" \| "COORDINADOR_LABORATORIO" \| "COORDINADOR_SOPORTE", idLaboratorio? }] }` · `401 CREDENCIALES_INVALIDAS` · `503 DIRECTORIO_NO_DISPONIBLE` |
 | `GET /api/v1/sesion` | Usuario actual y sus roles, para decidir la pantalla de inicio y el menú. | `200` mismo cuerpo · `401 NO_AUTENTICADO` |
 | `DELETE /api/v1/sesion` | Cerrar sesión. | `204` |
+| `GET /api/v1/sesion/usuarios-de-demostracion` | Solo en el núcleo ejecutable: usuarios para el selector de 15.7. | `200 [{ usuario, nombre }]` |
 
 ### CU-06 · Horario y asignación de turnos
 | Método y ruta | Uso | Respuesta |
 | --- | --- | --- |
 | `GET /api/v1/laboratorios` | Lista de laboratorios. | `200 [{ id, nombre, campus }]` |
-| `GET /api/v1/laboratorios/{idLaboratorio}/turnos?semana=AAAA-MM-DD` | Horario de la semana que empieza ese lunes. | `200 { idLaboratorio, semana, turnos: [{ id, fecha, horaInicio, horaFin, estado, asistente: { id, nombre } }] }` |
+| `GET /api/v1/laboratorios/{idLaboratorio}/turnos?semana=AAAA-MM-DD` | Horario de la semana que empieza ese lunes. | `200 { idLaboratorio, semana, turnos: [{ id, fecha, horaInicio, horaFin, estado, asistente: { id, nombre } \| null }] }` |
 | `GET /api/v1/laboratorios/{idLaboratorio}/asistentes?semana=AAAA-MM-DD` | Asistentes activos con lo necesario para elegir. | `200 [{ id, nombre, categoria, topeSemanalMinutos, minutosProgramadosSemana, disponibilidad: [{ dia, horaInicio, horaFin }] }]` |
 | `POST /api/v1/laboratorios/{idLaboratorio}/turnos` | Asignar turno (`asignarTurno`). Cabecera `Idempotency-Key`. Cuerpo: `{ idAsistente, fecha, horaInicio, horaFin }` | `201` (o `200` si es reenvío) `{ id, fecha, horaInicio, horaFin, estado: "ASIGNADO" \| "PENDIENTE_ACEPTACION", asistente: { id, nombre }, minutosSemanaAsistente, topeSemanalMinutos }` |
 

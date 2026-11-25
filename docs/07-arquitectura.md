@@ -95,7 +95,8 @@ backend/
 │   │   ├── identidad/                sesión, roles, Directorio
 │   │   └── notificaciones/           avisos en la app y por correo
 │   ├── compartido/
-│   │   └── dominio/                  núcleo compartido: Franja, Semana, Dinero, Reloj, ErrorDeDominio
+│   │   ├── dominio/                  núcleo compartido: Franja, Semana, Dinero, Reloj, ErrorDeDominio
+│   │   └── infraestructura/          piezas técnicas comunes: formato HTTP, reloj del sistema, unidad de trabajo en memoria
 │   ├── tareas-programadas/           disparadores por tiempo que invocan casos de uso
 │   └── arranque/                     raíz de composición: crea adaptadores, conecta módulos, levanta HTTP
 ├── tests/

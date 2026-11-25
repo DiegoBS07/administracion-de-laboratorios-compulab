@@ -2,7 +2,7 @@
 
 > Responde: ¿qué clases tiene el dominio, qué invariantes protegen y quién usa a quién?
 > Reglas de construcción (R-7): atributos privados (`#campo`), constructor privado y fábricas estáticas que verifican las invariantes antes de crear el objeto; los objetos valor son inmutables. Nada de modelo anémico: la regla vive en la clase que tiene los datos.
-> Versión 2026-11-24. Se completa sección por sección de la implementación: 9.1 a 9.4 están implementadas.
+> Versión 2026-11-24. Se completa sección por sección de la implementación: 9.1 a 9.5 están implementadas.
 
 ## 9.1 Núcleo compartido (`backend/src/compartido/dominio/`)
 
@@ -183,7 +183,9 @@ Leyenda: igual que 9.1; `<<aplicación>>` = controlador del caso de uso; rombo v
 
 Siete dependencias en `AsignarTurno` (más el `Reloj`): la revisión de 10.1 lo justifica; `Autorizacion` registra los accesos denegados por su cuenta para no sumar una octava.
 
-**Dobles de prueba:** `tests/modulos/horarios/dobles.ts` (repositorio en memoria con bloqueo por asistente y restricciones como las de la base, consulta de asistentes, calendario y autorización fijos) y `tests/dobles/` (`UnidadDeTrabajoEnMemoria` con transacciones aisladas, `NotificadorEnMemoria`, `GeneradorDeIdsSecuencial`, `RelojFijo`).
+**Consultas (sección 6):** `ListarLaboratorios`, `ConsultarHorario`, `ConsultarAsistentesDelLaboratorio`, `ConsultarCobertura` (interfaz provista `CoberturaDeLaboratorio`) y `ConsultarTurnosProgramados` (`TurnosProgramados`) viven en `aplicacion/consultas.ts`. No cambian nada y reutilizan las reglas del dominio: los minutos de la semana salen de `AgendaDelAsistente.minutosProgramados` y qué turnos abren el laboratorio, de `Turno.abreElLaboratorio()`.
+
+**Dobles de prueba:** `tests/modulos/horarios/dobles.ts` (consulta de asistentes, calendario y autorización fijos) y `tests/dobles/` (`NotificadorEnMemoria`, `GeneradorDeIdsSecuencial`, `RelojFijo`). El repositorio de turnos en memoria (bloqueo por asistente y restricciones como las de la base) y la `UnidadDeTrabajoEnMemoria` pasaron a `src/` en la sección 6 porque también los usa el backend del núcleo; las pruebas los reexportan.
 
 ## 9.3 Módulo reservas (CU-11) · `backend/src/modulos/reservas/`
 
@@ -405,4 +407,19 @@ Leyenda: igual que 9.1 a 9.3; `<<infraestructura>>` = adaptador que implementa u
 
 **Garantía mínima:** el archivo se genera antes de guardar y `guardar` es todo o nada, así que un fallo del generador (ext 7a) o una tarifa faltante (ext 5b) dejan el mes sin cerrar. El aviso `CIERRE_LISTO` va de último.
 
-**Dobles de prueba:** `tests/modulos/liquidacion/dobles.ts` (repositorio de cierres con la restricción única, horas, asistentes, tarifas, un generador que falla y la ayuda `turno`), más los dobles comunes de `tests/dobles/`.
+**Dobles de prueba:** `tests/modulos/liquidacion/dobles.ts` (horas, asistentes, tarifas, un generador que falla y la ayuda `turno`), más los dobles comunes de `tests/dobles/`. El repositorio de cierres en memoria, con la restricción única, está en `src/modulos/liquidacion/infraestructura/` desde la sección 6.
+
+## 9.5 Módulo identidad (sesión) · `backend/src/modulos/identidad/`
+
+Implementación mínima de ADR-0008 y ADR-0011 para que la API sepa quién llama. El Directorio real queda fuera del núcleo; lo reemplaza un doble con usuarios fijos detrás del mismo puerto `DirectorioInstitucional`.
+
+| Clase | Responsabilidad | Invariantes verificadas al crear | Errores que lanza | Reglas |
+| --- | --- | --- | --- | --- |
+| `Sesion` | La sesión propia de CompuLab: usuario, roles y vencimiento a las 8 h. Inmutable | Token de al menos 32 caracteres; usuario y nombre no vacíos; al menos un rol válido; un coordinador de laboratorio indica su laboratorio | `DatoInvalido` | ADR-0008 |
+| `IniciarSesion` (aplicación) | Autentica contra el Directorio, junta los roles internos (más `ESTUDIANTE` si es estudiante de la Escuela) y guarda la sesión | — | `CredencialesInvalidas`, `DirectorioNoDisponible`, `SinAccesoACompuLab` | ADR-0008, ADR-0011 (falla cerrado) |
+| `ObtenerSesion`, `CerrarSesion` (aplicación) | La sesión vigente de un token; cerrar no falla si ya no existe | — | `NoAutenticado` | — |
+| `ConsultarRoles` (aplicación) | Interfaz provista: roles de un usuario, para la `Autorizacion` de horarios | — | — | QA-7 |
+
+**Adaptadores del núcleo:** `DirectorioDeDemostracion` compara el secreto en tiempo constante, `RepositorioSesionesEnMemoria` indexa las sesiones por la huella SHA-256 del token y `GeneradorDeTokensAleatorio` entrega 32 bytes aleatorios. La cookie `compulab_sesion` es `HttpOnly` y `SameSite=Lax`; con `APP_COOKIE_SEGURA=true` también lleva `Secure`.
+
+**Permisos en el borde HTTP:** `AsignarTurno` verifica el permiso con su puerto `Autorizacion` (403 `SIN_PERMISO_SOBRE_LABORATORIO`). Las demás operaciones exigen el rol en la ruta (403 `SIN_PERMISO`): reservar pide `ESTUDIANTE`; el cierre y sus consultas piden `COORDINADOR_SOPORTE`; la lista de asistentes pide coordinador de laboratorio o de soporte.

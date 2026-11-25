@@ -17,7 +17,7 @@ Este directorio es la **fuente oficial del diseño**. Nada se implementa en `bac
 | 5 | Arquitectura | `07-arquitectura.md` | Vistas 4+1 (C4 nivel 2, procesos, desarrollo, física, escenario), funciones de aptitud y guía de cambios frecuentes |
 | 6 | Decisiones ADR | `adr/` | 11 ADR aceptados |
 | 7 | Componentes | `08-componentes.md` | C4 nivel 3, prueba de reemplazo, contratos y API de los 3 casos de uso |
-| 8 | Clases | `09-clases.md` | Núcleo compartido (9.1), horarios (9.2), reservas (9.3) y liquidación (9.4) implementados |
+| 8 | Clases | `09-clases.md` | Núcleo compartido (9.1), horarios (9.2), reservas (9.3), liquidación (9.4) e identidad (9.5) implementados |
 | 9 | Comportamiento | `10-comportamiento.md` | Realización interna de CU-06, CU-11 y CU-14; máquinas de estado de Turno y Reserva |
 | 10 | Patrones | `11-patrones.md` | Pendiente |
 | 11 | Trazabilidad | `12-trazabilidad.md` | Pendiente (los códigos ya están puestos para armarla) |

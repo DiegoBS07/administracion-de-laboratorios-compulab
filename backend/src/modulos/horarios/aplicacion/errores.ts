@@ -14,6 +14,13 @@ export class AsistenteNoExiste extends ErrorDeDominio {
   }
 }
 
+/** RF-11 · No existe un laboratorio con ese identificador (404). */
+export class LaboratorioNoExiste extends ErrorDeDominio {
+  constructor(idLaboratorio: string) {
+    super("LABORATORIO_NO_EXISTE", "No existe un laboratorio con ese identificador.", { idLaboratorio });
+  }
+}
+
 /** ADR-0010 · Se reutilizó una clave de solicitud con datos distintos (422). */
 export class ClaveDeSolicitudReutilizada extends ErrorDeDominio {
   constructor(claveSolicitud: string) {
